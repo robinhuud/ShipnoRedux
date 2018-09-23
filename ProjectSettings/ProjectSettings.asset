@@ -159,6 +159,7 @@ PlayerSettings:
   androidMaxAspectRatio: 2.1
   applicationIdentifier:
     Android: net.robinhayes.shipnoredux
+    Standalone: com.oculus.UnitySample
   buildNumber: {}
   AndroidBundleVersionCode: 1
   AndroidMinSdkVersion: 23
@@ -243,7 +244,7 @@ PlayerSettings:
   AndroidTargetDevice: 0
   AndroidSplashScreenScale: 0
   androidSplashScreen: {fileID: 0}
-  AndroidKeystoreName: D:/Unity/ShipnoRedux/Shipno ReDux/shipno.keystore
+  AndroidKeystoreName: D:/Unity/ShipnoRedux/shipno-redux/shipno.keystore
   AndroidKeyaliasName: shipno redux
   AndroidTVCompatibility: 1
   AndroidIsGame: 1
