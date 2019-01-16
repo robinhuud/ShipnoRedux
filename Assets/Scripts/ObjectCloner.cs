@@ -3,8 +3,11 @@
 public class ObjectCloner : MonoBehaviour {
     public GameObject cloneThis;
     public int numClones = 6;
+    public int textureIndex = 0;
     public Vector3 axis = Vector3.forward;
     public Vector3 offset = Vector3.zero;
+    [SerializeField]
+    public Texture[] colorTextures;
 
     private bool dirty = false;
 
@@ -14,8 +17,9 @@ public class ObjectCloner : MonoBehaviour {
         GameObject[] clones = new GameObject[numClones];
         Debug.Assert(cloneThis != null, "object cloneThis is not supplied, no object to clone");
         Debug.Assert(cloneThis.GetComponent<MeshFilter>() != null, "Supplied object cloneThis has no mesh renderer");
+        Debug.Assert(colorTextures.Length > 0, "No color Texture Array specified");
         for(int i=0; i<numClones; i++) {
-            clones[i] = createObject(cloneThis);
+            clones[i] = CreateObject(cloneThis);
             clones[i].transform.SetParent(this.transform);
         }
         dirty = true;
@@ -27,17 +31,17 @@ public class ObjectCloner : MonoBehaviour {
 	void Update () {
         if(dirty)
         {
-            reLayout();
+            ReLayout();
         }
     }
 
-    public void setNumber(int number)
+    public void SetNumber(int number)
     {
         if(number > numClones)
         {
             for(int i = 0; i < number - numClones; i++)
             {
-                GameObject newClone = createObject(cloneThis);
+                GameObject newClone = CreateObject(cloneThis);
                 newClone.transform.SetParent(this.transform);
             }
             dirty = true;
@@ -56,11 +60,28 @@ public class ObjectCloner : MonoBehaviour {
         if(dirty)
         {
             numClones = number;
-            reLayout();
+            ReLayout();
         }
     }
 
-    void reLayout()
+    public void ChangeColor(int direction)
+    {
+        if (direction < 0)
+        {
+            textureIndex -= 1;
+            if (textureIndex < 0)
+            {
+                textureIndex = colorTextures.Length - 1;
+            }
+        }
+        else if (direction > 0)
+        {
+            textureIndex = (textureIndex + 1) % colorTextures.Length;
+        }
+        this.transform.GetChild(0).GetComponent<MeshRenderer>().sharedMaterial.SetTexture("_MainTex", colorTextures[textureIndex]);
+    }
+
+    void ReLayout()
     {
         //Debug.Log("Relayout to " + numClones);
         for (int i = 0; i < numClones; i++)
@@ -70,7 +91,7 @@ public class ObjectCloner : MonoBehaviour {
         dirty = false;
     }
 
-    GameObject createObject(GameObject cloneThis)
+    GameObject CreateObject(GameObject cloneThis)
     {
         GameObject newGameObject = new GameObject("SwirlArm");
         newGameObject.AddComponent<MeshFilter>().sharedMesh = cloneThis.GetComponent<MeshFilter>().mesh;

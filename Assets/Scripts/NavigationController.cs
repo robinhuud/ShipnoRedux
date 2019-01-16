@@ -24,25 +24,25 @@ public class NavigationController : MonoBehaviour {
         }
 
         // Controller input for Oculus GO
-        if (OVRInput.Get(OVRInput.Button.DpadDown))
+        if (OVRInput.Get(OVRInput.Button.DpadDown) || Input.GetKeyDown(KeyCode.DownArrow))
         {
-            Debug.Log("GOT DOWN");
-            objectCloner.setNumber(objectCloner.numClones - 1);
+            //Debug.Log("GOT DOWN");
+            objectCloner.SetNumber(objectCloner.numClones - 1);
         }
-        if (OVRInput.Get(OVRInput.Button.DpadUp))
+        if (OVRInput.Get(OVRInput.Button.DpadUp) || Input.GetKeyDown(KeyCode.UpArrow))
         {
-            Debug.Log("GOT UP");
-            objectCloner.setNumber(objectCloner.numClones + 1);
+            //Debug.Log("GOT UP");
+            objectCloner.SetNumber(objectCloner.numClones + 1);
         }
-
-        // Keyboard input for PC
-        if (Input.GetKeyDown(KeyCode.UpArrow))
+        if (OVRInput.Get(OVRInput.Button.DpadLeft) || Input.GetKeyDown(KeyCode.LeftArrow))
         {
-            objectCloner.setNumber(objectCloner.numClones + 1);
+            //Debug.Log("GOT LEFT");
+            objectCloner.ChangeColor(-1);
         }
-        else if (Input.GetKeyDown(KeyCode.DownArrow))
+        if (OVRInput.Get(OVRInput.Button.DpadRight) || Input.GetKeyDown(KeyCode.RightArrow))
         {
-            objectCloner.setNumber(objectCloner.numClones - 1);
+            //Debug.Log("GOT RIGHT");
+            objectCloner.ChangeColor(1);
         }
 
         // process the audio signals, grab the frequencies from the ribbon, and pass them to the 2 audio sources

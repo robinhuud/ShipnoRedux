@@ -142,8 +142,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cloneThis: {fileID: 1259437090}
   numClones: 8
+  textureIndex: 0
   axis: {x: 0, y: 0, z: 1}
   offset: {x: 0, y: 0, z: 0}
+  colorTextures:
+  - {fileID: 2800000, guid: 65d8dedaa89409c4faad447fbe628cbb, type: 3}
+  - {fileID: 2800000, guid: 5d6a727f8e52b3641ae758c84e57e455, type: 3}
+  - {fileID: 2800000, guid: 3d57f73675a52ca4a8815a2718424a66, type: 3}
+  - {fileID: 2800000, guid: 6763445d59e269844a590590b4094c66, type: 3}
+  - {fileID: 2800000, guid: fe6609e4eda223a4a836d84470805ddc, type: 3}
 --- !u!4 &25400513
 Transform:
   m_ObjectHideFlags: 0
@@ -274,7 +281,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 599493692}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3, y: 0, z: 0}
+  m_LocalPosition: {x: -3, y: 0, z: -15}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -416,7 +423,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35a784671527d844f9cbc70539954a8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  frequency: 452
+  frequency: 448
   gain: 0
 --- !u!82 &1736354390
 AudioSource:
@@ -505,7 +512,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1736354388}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3, y: 0, z: 0}
+  m_LocalPosition: {x: 3, y: 0, z: -15}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
