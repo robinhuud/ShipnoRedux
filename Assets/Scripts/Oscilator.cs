@@ -5,11 +5,14 @@ using UnityEngine;
 public class Oscilator : MonoBehaviour {
 
     public double frequency = 440.0;
+    public float amplitude;
+    public float tooth = 0;
+
     private double increment;
     private double phase;
     private double sampling_frequency = 48000.0;
-
-    public float gain;
+    private float sin;
+    private float saw;
 
     void OnAudioFilterRead(float[] data, int channels)
     {
@@ -18,7 +21,9 @@ public class Oscilator : MonoBehaviour {
         for(int i = 0; i < data.Length; i+= channels)
         {
             phase += increment;
-            data[i] = (float)(gain * Mathf.Sin((float)phase));
+            sin = amplitude * Mathf.Sin((float)phase);
+            saw = amplitude - (amplitude / Mathf.PI * (float)phase);
+            data[i] = Mathf.Lerp(sin, saw, tooth);
 
             if(channels == 2)
             {

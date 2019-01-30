@@ -147,10 +147,12 @@ MonoBehaviour:
   offset: {x: 0, y: 0, z: 0}
   colorTextures:
   - {fileID: 2800000, guid: 65d8dedaa89409c4faad447fbe628cbb, type: 3}
+  - {fileID: 2800000, guid: b43e4a4ba57d794448a5b582a2818a05, type: 3}
   - {fileID: 2800000, guid: 5d6a727f8e52b3641ae758c84e57e455, type: 3}
   - {fileID: 2800000, guid: 3d57f73675a52ca4a8815a2718424a66, type: 3}
-  - {fileID: 2800000, guid: 6763445d59e269844a590590b4094c66, type: 3}
   - {fileID: 2800000, guid: fe6609e4eda223a4a836d84470805ddc, type: 3}
+  - {fileID: 2800000, guid: 84292db567157d04f86dabb9ad3e69f4, type: 3}
+  - {fileID: 2800000, guid: 6763445d59e269844a590590b4094c66, type: 3}
 --- !u!4 &25400513
 Transform:
   m_ObjectHideFlags: 0
@@ -193,7 +195,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   frequency: 440
-  gain: 0
+  amplitude: 0
+  tooth: 0
 --- !u!82 &599493694
 AudioSource:
   m_ObjectHideFlags: 0
@@ -424,7 +427,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   frequency: 448
-  gain: 0
+  amplitude: 0
+  tooth: 0
 --- !u!82 &1736354390
 AudioSource:
   m_ObjectHideFlags: 0

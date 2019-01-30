@@ -8,7 +8,6 @@ public class NavigationController : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        //Debug.Log("WOOT");
         OVRPlugin.vsyncCount = 0;
     }
 	
@@ -47,12 +46,14 @@ public class NavigationController : MonoBehaviour {
 
         // process the audio signals, grab the frequencies from the ribbon, and pass them to the 2 audio sources
         Vector2 frequency = ribbonGenerator.GetFrequency();
-        Vector2 volume = ribbonGenerator.GetVolume();
+        Vector2 amplitude = ribbonGenerator.GetVolume();
         audioSource1.frequency = frequency[0];
         audioSource2.frequency = frequency[1];
-        audioSource1.gain = volume[0];
-        audioSource2.gain = volume[1];
-	}
+        audioSource1.amplitude = amplitude[0];
+        audioSource2.amplitude = amplitude[1];
+        audioSource1.tooth = (amplitude[1]+.15f)/2f;
+        audioSource2.tooth = (amplitude[0]+.15f)/2f;
+    }
 
     void FixedUpdate()
     {

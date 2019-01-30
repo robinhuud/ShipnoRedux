@@ -11,12 +11,13 @@ public class RibbonGenerator : MonoBehaviour {
     // Public interface for getting a sound-scale frequency from the frequency of the ribbon -100-700ish)
     public Vector2 GetFrequency()
     {
-        return new Vector2((twirl.x - frequency.x) * t, (twirl.x - frequency.y) * t );
+        Vector3[] verts = GetComponent<MeshFilter>().mesh.vertices;
+        return new Vector2((verts[0].x)*129f, (verts[0].y)*120f);
     }
 
     public Vector2 GetVolume()
     {
-        return scale * .15f;
+        return new Vector2(Mathf.Sin(t) * .15f, Mathf.Cos(t)*.15f);
     }
 
     private Vector2 scale;
@@ -36,7 +37,7 @@ public class RibbonGenerator : MonoBehaviour {
         frequency = new Vector2(.2f, .13f);
         scale = new Vector2(2f, 2f);
         twirl = new Vector2(.2f, .21f);
-        t = 1500f;
+        t = 50f * (1f / Time.deltaTime * Random.value);
 	}
 
     Vector3[] GenerateInitialVerts(int length)
