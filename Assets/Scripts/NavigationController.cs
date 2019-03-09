@@ -26,12 +26,12 @@ public class NavigationController : MonoBehaviour {
         if (OVRInput.Get(OVRInput.Button.DpadDown) || Input.GetKeyDown(KeyCode.DownArrow))
         {
             //Debug.Log("GOT DOWN");
-            objectCloner.SetNumber(objectCloner.numClones - 1);
+            objectCloner.SetNumber(objectCloner.GetNumber() - 1);
         }
         if (OVRInput.Get(OVRInput.Button.DpadUp) || Input.GetKeyDown(KeyCode.UpArrow))
         {
             //Debug.Log("GOT UP");
-            objectCloner.SetNumber(objectCloner.numClones + 1);
+            objectCloner.SetNumber(objectCloner.GetNumber() + 1);
         }
         if (OVRInput.Get(OVRInput.Button.DpadLeft) || Input.GetKeyDown(KeyCode.LeftArrow))
         {
@@ -42,6 +42,12 @@ public class NavigationController : MonoBehaviour {
         {
             //Debug.Log("GOT RIGHT");
             objectCloner.ChangeColor(1);
+        }
+        if(OVRInput.Get(OVRInput.Button.PrimaryIndexTrigger) || Input.GetKeyDown((KeyCode.KeypadEnter)))
+        {
+            ribbonGenerator.RandomizeTime();
+            objectCloner.SetNumber(Random.Range(1, 15));
+            objectCloner.ChangeColor(Random.Range(-2, 2));
         }
 
         // process the audio signals, grab the frequencies from the ribbon, and pass them to the 2 audio sources

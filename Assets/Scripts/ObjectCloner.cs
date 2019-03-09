@@ -1,13 +1,16 @@
 ﻿using UnityEngine;
 
 public class ObjectCloner : MonoBehaviour {
-    public GameObject cloneThis;
-    public int numClones = 6;
-    public int textureIndex = 0;
+    [SerializeField]
+    private GameObject cloneThis;
+    [SerializeField]
+    private int numClones = 6;
+    [SerializeField]
+    private int textureIndex = 0;
     public Vector3 axis = Vector3.forward;
     public Vector3 offset = Vector3.zero;
     [SerializeField]
-    public Texture[] colorTextures;
+    private Texture[] colorTextures;
 
     private bool dirty = false;
 
@@ -64,25 +67,28 @@ public class ObjectCloner : MonoBehaviour {
         }
     }
 
-    public void ChangeColor(int direction)
+    public int GetNumber()
     {
-        if (direction < 0)
+        return numClones;
+    }
+
+    public void ChangeColor(int delta)
+    {
+        textureIndex += delta;
+        if(textureIndex < 0)
         {
-            textureIndex -= 1;
-            if (textureIndex < 0)
-            {
-                textureIndex = colorTextures.Length - 1;
-            }
+            textureIndex += colorTextures.Length;
         }
-        else if (direction > 0)
+        else
         {
-            textureIndex = (textureIndex + 1) % colorTextures.Length;
+            textureIndex = textureIndex % colorTextures.Length;
         }
+        
         this.transform.GetChild(0).GetComponent<MeshRenderer>().sharedMaterial.SetTexture("_MainTex", colorTextures[textureIndex]);
         this.transform.GetChild(0).GetComponent<MeshRenderer>().sharedMaterial.SetTexture("colorMap", colorTextures[textureIndex]);
     }
 
-    void ReLayout()
+    private void ReLayout()
     {
         //Debug.Log("Relayout to " + numClones);
         for (int i = 0; i < numClones; i++)
@@ -92,7 +98,7 @@ public class ObjectCloner : MonoBehaviour {
         dirty = false;
     }
 
-    GameObject CreateObject(GameObject cloneThis)
+    private GameObject CreateObject(GameObject cloneThis)
     {
         GameObject newGameObject = new GameObject("SwirlArm");
         newGameObject.AddComponent<MeshFilter>().sharedMesh = cloneThis.GetComponent<MeshFilter>().mesh;

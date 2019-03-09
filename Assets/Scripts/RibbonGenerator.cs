@@ -39,7 +39,7 @@ public class RibbonGenerator : MonoBehaviour {
         frequency = new Vector2(.2f, .13f);
         scale = new Vector2(2f, 2f);
         twirl = new Vector2(.2f, .21f);
-        t = 50f * (1f / Time.deltaTime * Random.value);
+        RandomizeTime();
 	}
 
     Vector3[] GenerateInitialVerts(int length)
@@ -78,6 +78,12 @@ public class RibbonGenerator : MonoBehaviour {
             newTriangles[6 * i + 5] = i + 1;
         }
         return newTriangles;
+    }
+
+    public void RandomizeTime()
+    {
+        // This is the magic!!
+        t = 50f * (1f / Time.deltaTime * Random.value);
     }
 
     // Update is called once per frame
