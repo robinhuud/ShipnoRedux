@@ -11,13 +11,13 @@ public class RibbonGenerator : MonoBehaviour {
     // Public interface for getting a sound-scale frequency from the frequency of the ribbon -100-700ish)
     public Vector2 GetFrequency()
     {
-        Vector3[] verts = GetComponent<MeshFilter>().mesh.vertices;
-        return new Vector2((verts[0].x)*129f, (verts[0].y)*120f);
+        Vector3[] verts = myMeshFilter.mesh.vertices;
+        return new Vector2(Mathf.Abs((verts[0].x))*60f+40f, Mathf.Abs((verts[0].y))*60f+49f);
     }
 
     public Vector2 GetVolume()
     {
-        return new Vector2(Mathf.Sin(t) * .15f, Mathf.Cos(t)*.15f);
+        return new Vector2(Mathf.Sin(t)*.15f, Mathf.Cos(t)*.15f);
     }
 
     private Vector2 scale;
@@ -25,12 +25,14 @@ public class RibbonGenerator : MonoBehaviour {
     private Vector2 twirl;
     private float t;
     private Vector2 tempVector;
+    private MeshFilter myMeshFilter;
 
 	// Use this for initialization
 	void Start () {
         //Debug.Log("Ribbongenerator start");
         Mesh mesh = new Mesh();
-        GetComponent<MeshFilter>().mesh = mesh;
+        myMeshFilter = GetComponent<MeshFilter>();
+        myMeshFilter.mesh = mesh;
         mesh.vertices = GenerateInitialVerts(ribbonLength);
         mesh.uv = GenerateUVs(ribbonLength);
         mesh.triangles = GenerateTriangles(mesh.vertices);
@@ -88,9 +90,8 @@ public class RibbonGenerator : MonoBehaviour {
         scale += new Vector2(d * .0537f * Mathf.Cos((t * .6f)), d * .0537f * Mathf.Sin((t * .35f)));
         frequency += new Vector2(d * 0.0037f * Mathf.Cos((t * .023f)), d * 0.0039f * Mathf.Sin((t * .032f)));
         twirl += new Vector2(d * .0063f * Mathf.Cos((t * .103f)), d * .0071f * Mathf.Sin((t * .172f)));
-        Mesh mesh = GetComponent<MeshFilter>().mesh;
-        UpdateVertexPositions(mesh, t, scale, frequency, twirl);
-        UpdateUVPositions(mesh, t);
+        UpdateVertexPositions(myMeshFilter.mesh, t, scale, frequency, twirl);
+        UpdateUVPositions(myMeshFilter.mesh, t);
     }
 
     // update vertex positions copies the x, and y values of each of the verts to the i-2'th vertex in the list, 
@@ -107,8 +108,8 @@ public class RibbonGenerator : MonoBehaviour {
         verts[0].x = scale.x * Mathf.Sin((t * frequency.x));
         verts[0].y = scale.y * Mathf.Cos((t * frequency.y));
         //Debug.Log("twirl: " + twirl.x + " " + twirl.y + " freq: " + frequency.x + " " + frequency.y + " scale: " + scale.x + " " + scale.y);
-        verts[1].x = verts[0].x + twirl.x * Mathf.Sin(twirl.x * t);
-        verts[1].y = verts[0].y + twirl.y * Mathf.Cos(twirl.y * t);
+        verts[1].x = verts[0].x + twirl.x * Mathf.Cos(twirl.x * t);
+        verts[1].y = verts[0].y + twirl.y * Mathf.Sin(twirl.y * t);
         mesh.vertices = verts;
     }
 

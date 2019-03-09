@@ -79,6 +79,7 @@ public class ObjectCloner : MonoBehaviour {
             textureIndex = (textureIndex + 1) % colorTextures.Length;
         }
         this.transform.GetChild(0).GetComponent<MeshRenderer>().sharedMaterial.SetTexture("_MainTex", colorTextures[textureIndex]);
+        this.transform.GetChild(0).GetComponent<MeshRenderer>().sharedMaterial.SetTexture("colorMap", colorTextures[textureIndex]);
     }
 
     void ReLayout()
