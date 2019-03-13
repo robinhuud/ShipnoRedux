@@ -5,6 +5,7 @@ public class NavigationController : MonoBehaviour {
     public ObjectCloner objectCloner;
     public Oscilator audioSource1;
     public Oscilator audioSource2;
+    public float masterVolume = 2f;
 
 	// Use this for initialization
 	void Start () {
@@ -55,10 +56,10 @@ public class NavigationController : MonoBehaviour {
         Vector2 amplitude = ribbonGenerator.GetVolume();
         audioSource1.frequency = frequency[0];
         audioSource2.frequency = frequency[1];
-        audioSource1.amplitude = amplitude[0];
-        audioSource2.amplitude = amplitude[1];
-        audioSource1.tooth = (amplitude[1]+.15f)/2f;
-        audioSource2.tooth = (amplitude[0]+.15f)/2f;
+        audioSource1.amplitude = amplitude[0] * masterVolume;
+        audioSource2.amplitude = amplitude[1] * masterVolume;
+        audioSource1.tooth = (amplitude[1]+.25f)/2f;
+        audioSource2.tooth = (amplitude[0]+.25f)/2f;
     }
 
     void FixedUpdate()

@@ -10,7 +10,9 @@ public class ObjectCloner : MonoBehaviour {
     public Vector3 axis = Vector3.forward;
     public Vector3 offset = Vector3.zero;
     [SerializeField]
-    private Texture[] colorTextures;
+    private Texture[] greyscaleTextures;
+    [SerializeField]
+    private Texture[] colorRamps;
 
     private bool dirty = false;
 
@@ -20,11 +22,13 @@ public class ObjectCloner : MonoBehaviour {
         GameObject[] clones = new GameObject[numClones];
         Debug.Assert(cloneThis != null, "object cloneThis is not supplied, no object to clone");
         Debug.Assert(cloneThis.GetComponent<MeshFilter>() != null, "Supplied object cloneThis has no mesh renderer");
-        Debug.Assert(colorTextures.Length > 0, "No color Texture Array specified");
-        for(int i=0; i<numClones; i++) {
+        Debug.Assert(greyscaleTextures.Length > 0, "No greyscale Texture Array specified");
+        Debug.Assert(colorRamps.Length > 0, "No color Ramp Array specified");
+        for (int i=0; i<numClones; i++) {
             clones[i] = CreateObject(cloneThis);
             clones[i].transform.SetParent(this.transform);
         }
+        ChangeColor(0);
         dirty = true;
 	}
 	
@@ -77,15 +81,15 @@ public class ObjectCloner : MonoBehaviour {
         textureIndex += delta;
         if(textureIndex < 0)
         {
-            textureIndex += colorTextures.Length;
+            textureIndex += colorRamps.Length;
         }
         else
         {
-            textureIndex = textureIndex % colorTextures.Length;
+            textureIndex = textureIndex % colorRamps.Length;
         }
         
-        this.transform.GetChild(0).GetComponent<MeshRenderer>().sharedMaterial.SetTexture("_MainTex", colorTextures[textureIndex]);
-        this.transform.GetChild(0).GetComponent<MeshRenderer>().sharedMaterial.SetTexture("colorMap", colorTextures[textureIndex]);
+        this.transform.GetChild(0).GetComponent<MeshRenderer>().sharedMaterial.SetTexture("_MainTex", greyscaleTextures[(int)Random.Range(0,greyscaleTextures.Length-1)]);
+        this.transform.GetChild(0).GetComponent<MeshRenderer>().sharedMaterial.SetTexture("colorMap", colorRamps[textureIndex]);
     }
 
     private void ReLayout()

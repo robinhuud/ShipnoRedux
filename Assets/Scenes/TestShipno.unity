@@ -146,14 +146,23 @@ MonoBehaviour:
   textureIndex: 0
   axis: {x: 0, y: 0, z: 1}
   offset: {x: 0, y: 0, z: 0}
-  colorTextures:
-  - {fileID: 2800000, guid: 65d8dedaa89409c4faad447fbe628cbb, type: 3}
-  - {fileID: 2800000, guid: b43e4a4ba57d794448a5b582a2818a05, type: 3}
-  - {fileID: 2800000, guid: 5d6a727f8e52b3641ae758c84e57e455, type: 3}
-  - {fileID: 2800000, guid: 3d57f73675a52ca4a8815a2718424a66, type: 3}
-  - {fileID: 2800000, guid: fe6609e4eda223a4a836d84470805ddc, type: 3}
-  - {fileID: 2800000, guid: 84292db567157d04f86dabb9ad3e69f4, type: 3}
-  - {fileID: 2800000, guid: 6763445d59e269844a590590b4094c66, type: 3}
+  greyscaleTextures:
+  - {fileID: 2800000, guid: bf32cc177a576a6479b4e4085b0b5336, type: 3}
+  - {fileID: 2800000, guid: ba57d215df4284947b580f7fd25191a1, type: 3}
+  - {fileID: 2800000, guid: f079af2ee625bd74bb5c61860a9e433c, type: 3}
+  - {fileID: 2800000, guid: 862ca8b975e6b1644b01720dc8274d8d, type: 3}
+  - {fileID: 2800000, guid: cb43bfd6982f44a4fa483963f5e00edd, type: 3}
+  - {fileID: 2800000, guid: f05e233a722e71447a82900aab09fbf4, type: 3}
+  - {fileID: 2800000, guid: c23f7f9b1a8e7ef43848ae4cffd8cc43, type: 3}
+  - {fileID: 2800000, guid: 3c41c863eda5be3428a26119b6dfcee7, type: 3}
+  colorRamps:
+  - {fileID: 2800000, guid: 6c41abb298542124aa00d927b023a170, type: 3}
+  - {fileID: 2800000, guid: 7cfb505f51d6cad41af46ad3fd14592f, type: 3}
+  - {fileID: 2800000, guid: c0ccb7257aa9a584998182f020727150, type: 3}
+  - {fileID: 2800000, guid: 08b2c1db4e850fc49a312e695cf45e72, type: 3}
+  - {fileID: 2800000, guid: 9b30fcf594c2bd84ab3a58cae413d702, type: 3}
+  - {fileID: 2800000, guid: bc20681e2f84b8d49b6624ba1b3d91c1, type: 3}
+  - {fileID: 2800000, guid: 9d0f0a3e5e89e4648acf2b143d193374, type: 3}
 --- !u!4 &25400513
 Transform:
   m_ObjectHideFlags: 0
@@ -419,6 +428,7 @@ MonoBehaviour:
   objectCloner: {fileID: 25400512}
   audioSource1: {fileID: 599493693}
   audioSource2: {fileID: 1736354389}
+  masterVolume: 2
 --- !u!1 &1259437090 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1324116726081602, guid: 84b7babd72cee85458079ffbc28392e1,
