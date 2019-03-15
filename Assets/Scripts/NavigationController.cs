@@ -6,6 +6,7 @@ public class NavigationController : MonoBehaviour {
     public Oscilator audioSource1;
     public Oscilator audioSource2;
     public float masterVolume = 2f;
+    private bool hasRandomized = false;
 
 	// Use this for initialization
 	void Start () {
@@ -46,9 +47,16 @@ public class NavigationController : MonoBehaviour {
         }
         if(OVRInput.Get(OVRInput.Button.PrimaryIndexTrigger) || Input.GetKeyDown((KeyCode.KeypadEnter)))
         {
-            ribbonGenerator.RandomizeTime();
-            objectCloner.SetNumber(Random.Range(1, 15));
-            objectCloner.ChangeColor(Random.Range(-2, 2));
+            if(!hasRandomized)
+            {
+                ribbonGenerator.RandomizeTime();
+                objectCloner.SetNumber(Random.Range(1, 15));
+                objectCloner.ChangeColor(Random.Range(-2, 2));
+                hasRandomized = true;
+            }
+        } else
+        {
+            hasRandomized = false;
         }
 
         // process the audio signals, grab the frequencies from the ribbon, and pass them to the 2 audio sources
@@ -58,8 +66,8 @@ public class NavigationController : MonoBehaviour {
         audioSource2.frequency = frequency[1];
         audioSource1.amplitude = amplitude[0] * masterVolume;
         audioSource2.amplitude = amplitude[1] * masterVolume;
-        audioSource1.tooth = (amplitude[1]+.25f)/2f;
-        audioSource2.tooth = (amplitude[0]+.25f)/2f;
+        audioSource1.tooth = Mathf.Abs(amplitude[0]+.5f)-.5f;
+        audioSource2.tooth = 1.5f - Mathf.Abs(amplitude[1]+.5f);
     }
 
     void FixedUpdate()
