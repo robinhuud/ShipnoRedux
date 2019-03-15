@@ -17,7 +17,7 @@ public class RibbonGenerator : MonoBehaviour {
 
     public Vector2 GetVolume()
     {
-        return new Vector2(Mathf.Sin(t)*.15f, Mathf.Cos(t)*.15f);
+        return new Vector2(Mathf.Sin(t), Mathf.Cos(t));
     }
 
     private Vector2 scale;

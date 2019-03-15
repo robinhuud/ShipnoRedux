@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 
 public class ObjectCloner : MonoBehaviour {
     [SerializeField]
@@ -6,27 +7,28 @@ public class ObjectCloner : MonoBehaviour {
     [SerializeField]
     private int numClones = 6;
     [SerializeField]
-    private int textureIndex = 0;
+    private int maxClones = 30;
     public Vector3 axis = Vector3.forward;
-    public Vector3 offset = Vector3.zero;
+    private Vector3 offset = Vector3.zero;
     [SerializeField]
     private Texture[] greyscaleTextures;
     [SerializeField]
     private Texture[] colorRamps;
 
+    private int textureIndex = 0;
+    public static List<GameObject> ribbonPool;
     private bool dirty = false;
 
 	// Use this for initialization
 	void Start () {
-        //Debug.Log("Objectcloner start ran");
-        GameObject[] clones = new GameObject[numClones];
         Debug.Assert(cloneThis != null, "object cloneThis is not supplied, no object to clone");
         Debug.Assert(cloneThis.GetComponent<MeshFilter>() != null, "Supplied object cloneThis has no mesh renderer");
         Debug.Assert(greyscaleTextures.Length > 0, "No greyscale Texture Array specified");
         Debug.Assert(colorRamps.Length > 0, "No color Ramp Array specified");
+        ribbonPool = new List<GameObject>();
         for (int i=0; i<numClones; i++) {
-            clones[i] = CreateObject(cloneThis);
-            clones[i].transform.SetParent(this.transform);
+            GameObject clone = CreateRibbon(cloneThis);
+            clone.transform.SetParent(this.transform);
         }
         ChangeColor(0);
         dirty = true;
@@ -42,38 +44,16 @@ public class ObjectCloner : MonoBehaviour {
         }
     }
 
-    public void SetNumber(int number)
-    {
-        if(number > numClones)
-        {
-            for(int i = 0; i < number - numClones; i++)
-            {
-                GameObject newClone = CreateObject(cloneThis);
-                newClone.transform.SetParent(this.transform);
-            }
-            dirty = true;
-        }
-        if(number < numClones)
-        {
-            if(number >= 1)
-            {
-                for(int i = 0; i < numClones - number; i++)
-                {
-                    Destroy(this.transform.GetChild(numClones-(i+1)).gameObject);
-                }
-                dirty = true;
-            }
-        }
-        if(dirty)
-        {
-            numClones = number;
-            ReLayout();
-        }
-    }
-
     public int GetNumber()
     {
         return numClones;
+    }
+
+    public void SetAngle(Quaternion newAxis)
+    {
+        //Debug.Log("NEW ANGLE " + newAxis);
+        axis = newAxis * Vector3.forward;
+        dirty = true;
     }
 
     public void ChangeColor(int delta)
@@ -88,13 +68,39 @@ public class ObjectCloner : MonoBehaviour {
             textureIndex = textureIndex % colorRamps.Length;
         }
         
-        this.transform.GetChild(0).GetComponent<MeshRenderer>().sharedMaterial.SetTexture("_MainTex", greyscaleTextures[(int)Random.Range(0,greyscaleTextures.Length-1)]);
+        this.transform.GetChild(0).GetComponent<MeshRenderer>().sharedMaterial.SetTexture("_MainTex", greyscaleTextures[(int)Random.Range(0,greyscaleTextures.Length)]);
         this.transform.GetChild(0).GetComponent<MeshRenderer>().sharedMaterial.SetTexture("colorMap", colorRamps[textureIndex]);
+    }
+
+    public void SetNumber(int number)
+    {
+        number = Mathf.Min(number, maxClones);
+        if (number > numClones)
+        {
+            for (int i = 0; i < number - numClones; i++)
+            {
+                GameObject newClone = CreateRibbon(cloneThis);
+                newClone.transform.SetParent(this.transform);
+            }
+            numClones = number;
+            dirty = true;
+        }
+        if (number < numClones)
+        {
+            if (number >= 1)
+            {
+                for (int i = 0; i < numClones - number; i++)
+                {
+                    FreeRibbon(this.transform.GetChild(numClones - (i + 1)).gameObject);
+                }
+                numClones = number;
+                dirty = true;
+            }
+        }
     }
 
     private void ReLayout()
     {
-        //Debug.Log("Relayout to " + numClones);
         for (int i = 0; i < numClones; i++)
         {
             this.transform.GetChild(i).SetPositionAndRotation(offset, Quaternion.AngleAxis(((float)i / (float)(numClones)) * (360f), axis));
@@ -102,11 +108,31 @@ public class ObjectCloner : MonoBehaviour {
         dirty = false;
     }
 
-    private GameObject CreateObject(GameObject cloneThis)
+    private static GameObject CreateRibbon(GameObject cloneThis)
     {
-        GameObject newGameObject = new GameObject("SwirlArm");
-        newGameObject.AddComponent<MeshFilter>().sharedMesh = cloneThis.GetComponent<MeshFilter>().mesh;
-        newGameObject.AddComponent<MeshRenderer>().sharedMaterial = cloneThis.GetComponent<MeshRenderer>().material;
-        return newGameObject;
+        GameObject target = null;
+        foreach(GameObject ob in ribbonPool)
+        {
+            if(!ob.activeInHierarchy)
+            {
+                // we find the first inactive object in the pool, and activate it
+                ob.SetActive(true);
+                target = ob;
+                break;
+            }
+        }
+        if(target == null)
+        {
+            target = new GameObject("SwirlArm");
+            ribbonPool.Add(target);
+            target.AddComponent<MeshFilter>().sharedMesh = cloneThis.GetComponent<MeshFilter>().mesh;
+            target.AddComponent<MeshRenderer>().sharedMaterial = cloneThis.GetComponent<MeshRenderer>().material;
+        }
+        return target;
+    }
+
+    private static void FreeRibbon(GameObject target)
+    {
+        target.SetActive(false);
     }
 }

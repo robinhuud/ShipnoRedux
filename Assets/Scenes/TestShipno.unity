@@ -143,9 +143,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cloneThis: {fileID: 1259437090}
   numClones: 8
-  textureIndex: 0
+  maxClones: 30
   axis: {x: 0, y: 0, z: 1}
-  offset: {x: 0, y: 0, z: 0}
   greyscaleTextures:
   - {fileID: 2800000, guid: bf32cc177a576a6479b4e4085b0b5336, type: 3}
   - {fileID: 2800000, guid: ba57d215df4284947b580f7fd25191a1, type: 3}
@@ -428,7 +427,6 @@ MonoBehaviour:
   objectCloner: {fileID: 25400512}
   audioSource1: {fileID: 599493693}
   audioSource2: {fileID: 1736354389}
-  masterVolume: 2
 --- !u!1 &1259437090 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1324116726081602, guid: 84b7babd72cee85458079ffbc28392e1,
