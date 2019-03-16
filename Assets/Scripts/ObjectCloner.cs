@@ -2,21 +2,22 @@
 using System.Collections.Generic;
 
 public class ObjectCloner : MonoBehaviour {
-    [SerializeField]
+    //This Serializable private field pattern is good C# form, but causes compiler warnings in Unity, if you want to get rid of the warning, make them public
+    [SerializeField] 
     private GameObject cloneThis;
-    [SerializeField]
-    private int numClones = 6;
-    [SerializeField]
-    private int maxClones = 30;
-    public Vector3 axis = Vector3.forward;
-    private Vector3 offset = Vector3.zero;
     [SerializeField]
     private Texture[] greyscaleTextures;
     [SerializeField]
     private Texture[] colorRamps;
+    [SerializeField]
+    private int numClones = 6;
+    [SerializeField]
+    private int maxClones = 30;
+    [SerializeField]
+    private Vector3 axis = Vector3.forward;
 
     private int textureIndex = 0;
-    public static List<GameObject> ribbonPool;
+    private static List<GameObject> ribbonPool;
     private bool dirty = false;
 
 	// Use this for initialization
@@ -103,7 +104,7 @@ public class ObjectCloner : MonoBehaviour {
     {
         for (int i = 0; i < numClones; i++)
         {
-            this.transform.GetChild(i).SetPositionAndRotation(offset, Quaternion.AngleAxis(((float)i / (float)(numClones)) * (360f), axis));
+            this.transform.GetChild(i).SetPositionAndRotation(Vector3.zero, Quaternion.AngleAxis(((float)i / (float)(numClones)) * (360f), axis));
         }
         dirty = false;
     }

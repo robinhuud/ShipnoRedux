@@ -7,17 +7,17 @@ public class RibbonGenerator : MonoBehaviour {
     public int ribbonLength = 32;
     public float timeScale = 20f;
 
-
     // Public interface for getting a sound-scale frequency from the frequency of the ribbon -100-700ish)
-    public Vector2 GetFrequency()
+    // this really doesn't belong here
+    public Vector2 GetAudioFrequencies()
     {
         Vector3[] verts = myMeshFilter.mesh.vertices;
-        return new Vector2(Mathf.Abs((verts[0].x))*60f+40f, Mathf.Abs((verts[0].y))*60f+49f);
+        return new Vector2(Mathf.Abs((verts[0].x)), Mathf.Abs((verts[0].y)));
     }
 
-    public Vector2 GetVolume()
+    public Vector2 GetSinCos(float timeMultiplier = 1f)
     {
-        return new Vector2(Mathf.Sin(t), Mathf.Cos(t));
+        return new Vector2(Mathf.Sin(timeMultiplier * t * frequency.x), Mathf.Cos(timeMultiplier * t * frequency.y));
     }
 
     private Vector2 scale;
@@ -45,6 +45,7 @@ public class RibbonGenerator : MonoBehaviour {
     Vector3[] GenerateInitialVerts(int length)
     {
         Vector3[] newVerts = new Vector3[2 * length];
+        // These starting values are just placeholders to get the 
         for(int i = 0; i < length; i++)
         {
             newVerts[2 * i] = new Vector3(Mathf.Cos((float)i * .2f), Mathf.Sin((float)i * .16f), (length / 4) - (float)i * .5f);
@@ -70,19 +71,20 @@ public class RibbonGenerator : MonoBehaviour {
         int[] newTriangles = new int[3 * (2 * (verts.Length - 2))];
         for (int i = 0; i < verts.Length - 2; i++)
         {
-            newTriangles[6 * i] = i;
-            newTriangles[6 * i + 1] = i + 1;
-            newTriangles[6 * i + 2] = i + 2;
-            newTriangles[6 * i + 3] = i;
-            newTriangles[6 * i + 4] = i + 2;
-            newTriangles[6 * i + 5] = i + 1;
+            int j = 6 * i;
+            newTriangles[j++] = i;
+            newTriangles[j++] = i + 1;
+            newTriangles[j++] = i + 2;
+            newTriangles[j++] = i;
+            newTriangles[j++] = i + 2;
+            newTriangles[j++] = i + 1;
         }
         return newTriangles;
     }
 
     public void RandomizeTime()
     {
-        // This is the magic!!
+        // This basically changes the "speed" of the overall simulation.
         t = 50f * (1f / Time.deltaTime * Random.value);
     }
 
@@ -93,6 +95,7 @@ public class RibbonGenerator : MonoBehaviour {
         t += (timeScale * d) * Mathf.Cos(Time.time * .0237f);
         //Debug.Log("Time is " + (float)t);
 
+        // Secret sauce
         scale += new Vector2(d * .0537f * Mathf.Cos((t * .6f)), d * .0537f * Mathf.Sin((t * .35f)));
         frequency += new Vector2(d * 0.0037f * Mathf.Cos((t * .023f)), d * 0.0039f * Mathf.Sin((t * .032f)));
         twirl += new Vector2(d * .0063f * Mathf.Cos((t * .103f)), d * .0071f * Mathf.Sin((t * .172f)));
