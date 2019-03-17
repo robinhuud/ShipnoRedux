@@ -3,17 +3,32 @@
 public class NavigationController : MonoBehaviour {
     public RibbonGenerator ribbonGenerator;
     public ObjectCloner objectCloner;
-    public Oscilator audioSource1;
-    public Oscilator audioSource2;
+    public AudioSynth audioSynth;
 
 	// Use this for initialization
 	void Start () {
+        if(audioSynth == null)
+        {
+            audioSynth = GetComponent<AudioSynth>();
+        }
         if(OVRManager.display != null)  //OVRManager.display exists or it doesn't, no flag to check other than if it's null.
         {
+            OVRManager.display.RecenteredPose += Recenter;
             // Oh yeah, 72Hz mode on Oculus Go, why not right?
             OVRManager.display.displayFrequency = 72.0f;
         }
         OVRPlugin.vsyncCount = 0;
+    }
+
+    // This along with the OVRManager.display.RecenteredPose += Recenter; in the Start() method
+    // is supposed to allow us to be notified when the pose gets recentered, so we can move the
+    // major axis back to be lined up with the camera's forward direction.
+    // Unfortunately it doesn't work.
+    public void Recenter()
+    {
+        // This never gets called!!!!
+        Debug.Log("RecenteredPose event");
+        objectCloner.SetAngle(Quaternion.identity);
     }
 
     void FixedUpdate()
@@ -23,15 +38,14 @@ public class NavigationController : MonoBehaviour {
 
     void Update ()
     {
+        OVRInput.Update();
         HandleInput();
         ProcessAudio();
     }
 
     private void HandleInput()
     {
-
         //Currently handling Oculus GO and keyboard input types
-        OVRInput.Update();
 
         // Back is Quit
         if (OVRInput.GetUp(OVRInput.Button.Back))
@@ -64,7 +78,16 @@ public class NavigationController : MonoBehaviour {
         if (OVRInput.GetDown(OVRInput.Button.PrimaryTouchpad) || Input.GetKeyDown(KeyCode.R))
         {
             //Debug.Log("GOT TRACKPAD CLICK");
-            ribbonGenerator.RandomizeTime();
+            float speedOverride = -1f;
+            Quaternion controllerLocalRotation = OVRInput.GetLocalControllerRotation(OVRInput.GetActiveController());
+            if(controllerLocalRotation != Quaternion.identity)
+            {
+                speedOverride = controllerLocalRotation.eulerAngles.z;
+                // Convert in to range of 0-1 (or more accurately -.5 to 1.5, but the outliers require an extreme wrist twist)
+                speedOverride = speedOverride > 180f ? (360f - speedOverride) / 180f + .5f : (90 - speedOverride) / 180f;
+            }
+            //Debug.Log("ControllerTwist " + controllerTwist);
+            ribbonGenerator.RandomizeTime(speedOverride);
             objectCloner.SetNumber(Random.Range(1, 15));
             objectCloner.ChangeColor(Random.Range(-2, 2));
             objectCloner.SetAngle(Quaternion.identity);
@@ -74,21 +97,14 @@ public class NavigationController : MonoBehaviour {
             //Debug.Log("GOT TRIGGER");
             objectCloner.SetAngle(OVRInput.GetLocalControllerRotation(OVRInput.GetActiveController()));
         }
-
     }
 
     private void ProcessAudio()
     {
-        // process the audio signals, grab the frequencies from the ribbon, and pass them to the 2 audio sources
+        //grab the frequencies and beats from the ribbon, and pass them to the audioSynth
         Vector2 frequencies = ribbonGenerator.GetAudioFrequencies();
         Vector2 baseBeat = ribbonGenerator.GetSinCos();
         Vector2 beatFour = ribbonGenerator.GetSinCos(4);
-        audioSource1.frequency = frequencies[0] * 40f + 60f;
-        audioSource2.frequency = frequencies[1] * 80f + 120f;
-        audioSource1.amplitude = Mathf.Abs(Mathf.Pow(baseBeat[0],6f));
-        audioSource2.amplitude = Mathf.Abs(baseBeat[1] * beatFour[1] * .5f);
-        audioSource1.tooth = 1f - Mathf.Abs(baseBeat[0] + .5f);
-        audioSource2.tooth = Mathf.Abs(beatFour[0] * baseBeat[1] * .25f);
+        audioSynth.ProcessAudio(frequencies, baseBeat, beatFour);
     }
-
 }

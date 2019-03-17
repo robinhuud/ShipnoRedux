@@ -82,10 +82,10 @@ public class RibbonGenerator : MonoBehaviour {
         return newTriangles;
     }
 
-    public void RandomizeTime()
+    public void RandomizeTime(float cheat = -1f)
     {
-        // This basically changes the "speed" of the overall simulation.
-        t = 50f * (1f / Time.deltaTime * Random.value);
+        // This basically changes the "speed" of the overall simulation, "cheat" value can be passed in to force a particular outcome
+        t = 50f * (1f / Time.deltaTime * (cheat == -1 ? Random.value : cheat));
     }
 
     // Update is called once per frame

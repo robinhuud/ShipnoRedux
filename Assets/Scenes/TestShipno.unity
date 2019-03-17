@@ -209,6 +209,7 @@ MonoBehaviour:
   frequency: 440
   amplitude: 0
   tooth: 0
+  whistle: 0
 --- !u!82 &599493694
 AudioSource:
   m_ObjectHideFlags: 0
@@ -332,6 +333,7 @@ GameObject:
   - component: {fileID: 1212213647}
   - component: {fileID: 1212213646}
   - component: {fileID: 1212213650}
+  - component: {fileID: 1212213651}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -425,6 +427,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ribbonGenerator: {fileID: 1259437093}
   objectCloner: {fileID: 25400512}
+  audioSynth: {fileID: 1212213651}
+--- !u!114 &1212213651
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1212213645}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61f8cf2d874b1e74d8fe22b8c6c5efbd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   audioSource1: {fileID: 599493693}
   audioSource2: {fileID: 1736354389}
 --- !u!1 &1259437090 stripped
@@ -478,6 +493,7 @@ MonoBehaviour:
   frequency: 448
   amplitude: 0
   tooth: 0
+  whistle: 0
 --- !u!82 &1736354390
 AudioSource:
   m_ObjectHideFlags: 0
