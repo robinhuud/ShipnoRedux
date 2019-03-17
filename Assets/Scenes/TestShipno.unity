@@ -208,8 +208,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   frequency: 440
   amplitude: 0
-  tooth: 0
   whistle: 0
+  tooth: 0
 --- !u!82 &599493694
 AudioSource:
   m_ObjectHideFlags: 0
@@ -492,8 +492,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   frequency: 448
   amplitude: 0
-  tooth: 0
   whistle: 0
+  tooth: 0
 --- !u!82 &1736354390
 AudioSource:
   m_ObjectHideFlags: 0
@@ -614,7 +614,12 @@ PrefabInstance:
     - target: {fileID: 114455128382909976, guid: 84b7babd72cee85458079ffbc28392e1,
         type: 3}
       propertyPath: timeScale
-      value: 6.5
+      value: 7.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 114455128382909976, guid: 84b7babd72cee85458079ffbc28392e1,
+        type: 3}
+      propertyPath: ribbonLength
+      value: 96
       objectReference: {fileID: 0}
     - target: {fileID: 4319696221230066, guid: 84b7babd72cee85458079ffbc28392e1, type: 3}
       propertyPath: m_LocalPosition.x
