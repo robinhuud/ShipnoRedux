@@ -4,7 +4,7 @@
     {
         _MainTex ("Texture", 2D) = "white" {}
 		colorMap("ColorMap", 2D) = "white" {}
-		_CycleSpeed("Cycle Speed", Float) = 2.0
+		_CycleSpeed("Cycle Speed", Float) = 1.0
     }
     SubShader
     {

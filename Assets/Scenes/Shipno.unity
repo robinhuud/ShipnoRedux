@@ -208,7 +208,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   frequency: 440
   amplitude: 0
-  whistle: 0
+  bounce: 0
   tooth: 0
 --- !u!82 &599493694
 AudioSource:
@@ -226,7 +226,7 @@ AudioSource:
   m_Pitch: 1
   Loop: 0
   Mute: 0
-  Spatialize: 0
+  Spatialize: 1
   SpatializePostEffects: 0
   Priority: 128
   DopplerLevel: 1
@@ -440,8 +440,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61f8cf2d874b1e74d8fe22b8c6c5efbd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  audioSource1: {fileID: 599493693}
-  audioSource2: {fileID: 1736354389}
+  oscilators:
+  - {fileID: 599493693}
+  - {fileID: 1736354389}
 --- !u!1 &1259437090 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1324116726081602, guid: 84b7babd72cee85458079ffbc28392e1,
@@ -490,9 +491,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35a784671527d844f9cbc70539954a8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  frequency: 448
+  frequency: 440
   amplitude: 0
-  whistle: 0
+  bounce: 0
   tooth: 0
 --- !u!82 &1736354390
 AudioSource:
@@ -510,7 +511,7 @@ AudioSource:
   m_Pitch: 1
   Loop: 0
   Mute: 0
-  Spatialize: 0
+  Spatialize: 1
   SpatializePostEffects: 0
   Priority: 128
   DopplerLevel: 1

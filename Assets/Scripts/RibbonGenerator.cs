@@ -9,10 +9,10 @@ public class RibbonGenerator : MonoBehaviour {
 
     // Public interface for getting a sound-scale frequency from the frequency of the ribbon -100-700ish)
     // this really doesn't belong here
-    public Vector2 GetAudioFrequencies()
+    public Vector2 GetScaledEndPoint()
     {
         Vector3[] verts = myMeshFilter.mesh.vertices;
-        return new Vector2(Mathf.Abs((verts[0].x)), Mathf.Abs((verts[0].y)));
+        return new Vector2((verts[0].x / scale.x), (verts[0].y / scale.y));
     }
 
     public Vector2 GetSinCos(float timeMultiplier = 1f)

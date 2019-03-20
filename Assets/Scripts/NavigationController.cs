@@ -34,13 +34,13 @@ public class NavigationController : MonoBehaviour {
     void FixedUpdate()
     {
         OVRInput.FixedUpdate();
+        ProcessAudio();
     }
 
     void Update ()
     {
         OVRInput.Update();
         HandleInput();
-        ProcessAudio();
     }
 
     private void HandleInput()
@@ -102,9 +102,9 @@ public class NavigationController : MonoBehaviour {
     private void ProcessAudio()
     {
         //grab the frequencies and beats from the ribbon, and pass them to the audioSynth
-        Vector2 frequencies = ribbonGenerator.GetAudioFrequencies();
+        Vector2 frequencies = ribbonGenerator.GetScaledEndPoint();
         Vector2 baseBeat = ribbonGenerator.GetSinCos();
-        Vector2 beatFour = ribbonGenerator.GetSinCos(4);
-        audioSynth.ProcessAudio(frequencies, baseBeat, beatFour);
+        Vector2 halfBeat = ribbonGenerator.GetSinCos(2);
+        audioSynth.ProcessAudio(frequencies, baseBeat, halfBeat);
     }
 }

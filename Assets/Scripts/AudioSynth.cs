@@ -4,30 +4,20 @@ using UnityEngine;
 
 public class AudioSynth : MonoBehaviour
 {
-    public Oscilator audioSource1;
-    public Oscilator audioSource2;
-    // Start is called before the first frame update
-    void Start()
+    [SerializeField]
+    public Oscilator[] oscilators;
+
+    public void ProcessAudio(Vector2 frequencies, Vector2 baseBeat, Vector2 halfBeat)
     {
-        
+        oscilators[0].frequency = (1f + Mathf.Abs(frequencies[0])) * 40f + 120f;
+        oscilators[0].amplitude = .8f * Mathf.Abs(Mathf.Pow(baseBeat[0], 6f));
+        oscilators[0].tooth = 1f - Mathf.Abs(baseBeat[0] + .5f * halfBeat[1]);
+        oscilators[0].bounce = Mathf.Abs(halfBeat[1] * baseBeat[0]);
+
+        oscilators[1].frequency = (1f - Mathf.Abs(frequencies[1])) * 40f + 80f;
+        oscilators[1].amplitude = .8f * Mathf.Abs(baseBeat[1]);
+        oscilators[1].tooth = .45f * Mathf.Abs(.8f - Mathf.Pow(halfBeat[0] * baseBeat[1], 1f));
+        oscilators[1].bounce = 1f - (Mathf.Abs(halfBeat[0] * baseBeat[1]));
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-    public void ProcessAudio(Vector2 frequencies, Vector2 baseBeat, Vector2 beatFour)
-    {
-        // Convert -1 - 1 frequency to Audio levels
-        audioSource1.frequency = frequencies[0] * 40f + 60f;
-        audioSource2.frequency = frequencies[1] * 80f + 120f;
-        audioSource1.amplitude = Mathf.Abs(Mathf.Pow(baseBeat[0], 6f));
-        audioSource2.amplitude = Mathf.Abs(baseBeat[1] * beatFour[1]);
-        audioSource1.tooth = 1f - Mathf.Abs(baseBeat[0] + .5f * beatFour[0]);
-        audioSource2.tooth = Mathf.Abs(beatFour[0] * baseBeat[1] * .25f);
-        audioSource1.whistle = Mathf.Abs(beatFour[1] * baseBeat[0]);
-        audioSource2.whistle = 1f - (Mathf.Abs(beatFour[0] * baseBeat[1]));
-    }
 }
