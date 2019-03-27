@@ -20,11 +20,11 @@ public class RibbonGenerator : MonoBehaviour {
         return new Vector2(Mathf.Sin(timeMultiplier * t * frequency.x), Mathf.Cos(timeMultiplier * t * frequency.y));
     }
 
+    // Private Variables control the ribbon
     private Vector2 scale;
     private Vector2 frequency;
     private Vector2 twirl;
     private float t;
-    private Vector2 tempVector;
     private MeshFilter myMeshFilter;
 
 	// Use this for initialization
@@ -85,14 +85,16 @@ public class RibbonGenerator : MonoBehaviour {
     public void RandomizeTime(float cheat = -1f)
     {
         // This basically changes the "speed" of the overall simulation, "cheat" value can be passed in to force a particular outcome
-        t = 50f * (1f / Time.deltaTime * (cheat == -1 ? Random.value : cheat));
+        t = 50f * (1f / Time.deltaTime * (cheat == -1 ? Random.value : cheat)); // Using 1/Time.deltaTime just for some extra non-determinism usually between 60 and 200
+
+        //Debug.Log("New T:" + t);
     }
 
     // Update is called once per frame
     void Update()
     {
         float d = Time.deltaTime;
-        t += (timeScale * d) * Mathf.Cos(Time.time * .0237f);
+        t += (timeScale * d) * Mathf.Cos(t * .0237f);
         //Debug.Log("Time is " + (float)t);
 
         // Secret sauce

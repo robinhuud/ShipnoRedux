@@ -11,7 +11,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Shipno.unity
     guid: f16dc60f9d6076947843ef82c13913a4
-  - enabled: 1
-    path: Assets/Scenes/Stars.unity
+  - enabled: 0
+    path: Assets/Scenes/Rings.unity
     guid: d277ada2359242143991b44ff7496691
   m_configObjects: {}

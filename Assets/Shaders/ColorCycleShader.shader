@@ -8,11 +8,12 @@
     }
     SubShader
     {
-        // No culling or depth
-        Cull Off ZWrite Off ZTest Always
+        // No culling, but depth is fine
+        Cull Off ZWrite On ZTest LEqual
 
         Pass
         {
+
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag

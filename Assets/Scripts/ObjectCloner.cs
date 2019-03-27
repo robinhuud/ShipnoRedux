@@ -19,6 +19,7 @@ public class ObjectCloner : MonoBehaviour {
     private int textureIndex = 0;
     private static List<GameObject> ribbonPool;
     private bool dirty = false;
+    private Material sharedMat;
 
 	// Use this for initialization
 	void Start () {
@@ -31,6 +32,7 @@ public class ObjectCloner : MonoBehaviour {
             GameObject clone = CreateRibbon(cloneThis);
             clone.transform.SetParent(this.transform);
         }
+        sharedMat = this.transform.GetChild(0).GetComponent<MeshRenderer>().sharedMaterial;
         ChangeColor(0);
         dirty = true;
 	}
@@ -71,6 +73,7 @@ public class ObjectCloner : MonoBehaviour {
         
         this.transform.GetChild(0).GetComponent<MeshRenderer>().sharedMaterial.SetTexture("_MainTex", greyscaleTextures[(int)Random.Range(0,greyscaleTextures.Length)]);
         this.transform.GetChild(0).GetComponent<MeshRenderer>().sharedMaterial.SetTexture("colorMap", colorRamps[textureIndex]);
+        sharedMat.SetFloat("_CycleSpeed", Random.Range(-3f, 3f));
     }
 
     public void SetNumber(int number)

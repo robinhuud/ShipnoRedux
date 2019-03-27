@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class NavigationController : MonoBehaviour {
+public class InputHandler : MonoBehaviour {
     public RibbonGenerator ribbonGenerator;
     public ObjectCloner objectCloner;
     public AudioSynth audioSynth;
@@ -19,7 +19,7 @@ public class NavigationController : MonoBehaviour {
         }
         OVRPlugin.vsyncCount = 0;
     }
-
+     
     // This along with the OVRManager.display.RecenteredPose += Recenter; in the Start() method
     // is supposed to allow us to be notified when the pose gets recentered, so we can move the
     // major axis back to be lined up with the camera's forward direction.
@@ -83,8 +83,8 @@ public class NavigationController : MonoBehaviour {
             if(controllerLocalRotation != Quaternion.identity)
             {
                 speedOverride = controllerLocalRotation.eulerAngles.z;
-                // Convert in to range of 0-1 (or more accurately -.5 to 1.5, but the outliers require an extreme wrist twist)
-                speedOverride = speedOverride > 180f ? (360f - speedOverride) / 180f + .5f : (90 - speedOverride) / 180f;
+                // Convert in to range of 0-1
+                speedOverride = 1f - (speedOverride > 180f ? (180f - speedOverride) / 360f: (360f - speedOverride) / 360f + .5f);
             }
             //Debug.Log("ControllerTwist " + controllerTwist);
             ribbonGenerator.RandomizeTime(speedOverride);

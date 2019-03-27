@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 4760017178176602515}
   - component: {fileID: 4760017178176602512}
   - component: {fileID: 4760017178176602513}
-  - component: {fileID: 6169906420305329650}
   m_Layer: 0
   m_Name: StarField
   m_TagString: Untagged
@@ -4699,19 +4698,3 @@ ParticleSystemRenderer:
   m_Mesh2: {fileID: 0}
   m_Mesh3: {fileID: 0}
   m_MaskInteraction: 0
---- !u!114 &6169906420305329650
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4760017178176602518}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 35a784671527d844f9cbc70539954a8c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  frequency: 410.06
-  amplitude: 0
-  whistle: 0
-  tooth: 0
