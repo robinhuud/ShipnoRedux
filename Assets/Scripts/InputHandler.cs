@@ -75,7 +75,7 @@ public class InputHandler : MonoBehaviour {
             //Debug.Log("GOT RIGHT");
             objectCloner.ChangeColor(1);
         }
-        if (OVRInput.GetDown(OVRInput.Button.PrimaryTouchpad) || Input.GetKeyDown(KeyCode.R))
+        if (OVRInput.GetUp(OVRInput.Button.PrimaryTouchpad) || Input.GetKeyDown(KeyCode.R))
         {
             //Debug.Log("GOT TRACKPAD CLICK");
             float speedOverride = -1f;

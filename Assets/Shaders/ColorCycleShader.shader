@@ -1,4 +1,4 @@
-﻿Shader "Hidden/ColorCycleShader"
+﻿Shader "Custom/ColorCycleShader"
 {
     Properties
     {
