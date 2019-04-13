@@ -21,14 +21,15 @@ public class ObjectCloner : MonoBehaviour {
     private bool dirty = false;
     private Material sharedMat;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
         Debug.Assert(cloneThis != null, "object cloneThis is not supplied, no object to clone");
         Debug.Assert(cloneThis.GetComponent<MeshFilter>() != null, "Supplied object cloneThis has no mesh renderer");
         Debug.Assert(greyscaleTextures.Length > 0, "No greyscale Texture Array specified");
         Debug.Assert(colorRamps.Length > 0, "No color Ramp Array specified");
         ribbonPool = new List<GameObject>();
-        for (int i=0; i<numClones; i++) {
+        for (int i = 0; i < numClones; i++)
+        {
             GameObject clone = CreateRibbon(cloneThis);
             clone.transform.SetParent(this.transform);
         }
@@ -73,7 +74,7 @@ public class ObjectCloner : MonoBehaviour {
         
         this.transform.GetChild(0).GetComponent<MeshRenderer>().sharedMaterial.SetTexture("_MainTex", greyscaleTextures[(int)Random.Range(0,greyscaleTextures.Length)]);
         this.transform.GetChild(0).GetComponent<MeshRenderer>().sharedMaterial.SetTexture("colorMap", colorRamps[textureIndex]);
-        sharedMat.SetFloat("_CycleSpeed", Random.Range(-3f, 3f));
+        sharedMat.SetFloat("_CycleSpeed", Random.Range(-5f, 5f));
     }
 
     public void SetNumber(int number)
@@ -107,7 +108,7 @@ public class ObjectCloner : MonoBehaviour {
     {
         for (int i = 0; i < numClones; i++)
         {
-            this.transform.GetChild(i).SetPositionAndRotation(Vector3.zero, Quaternion.AngleAxis(((float)i / (float)(numClones)) * (360f), axis));
+            this.transform.GetChild(i).SetPositionAndRotation(this.transform.position, Quaternion.AngleAxis(((float)i / (float)(numClones)) * (360f), axis));
         }
         dirty = false;
     }
@@ -127,7 +128,7 @@ public class ObjectCloner : MonoBehaviour {
         }
         if(target == null)
         {
-            target = new GameObject("SwirlArm");
+            target = new GameObject("SwirlArm_"+ribbonPool.Count);
             ribbonPool.Add(target);
             target.AddComponent<MeshFilter>().sharedMesh = cloneThis.GetComponent<MeshFilter>().mesh;
             target.AddComponent<MeshRenderer>().sharedMaterial = cloneThis.GetComponent<MeshRenderer>().material;

@@ -1,9 +1,14 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 public class InputHandler : MonoBehaviour {
     public RibbonGenerator ribbonGenerator;
     public ObjectCloner objectCloner;
     public AudioSynth audioSynth;
+    public float fadeTime = 3f;
+
+    private bool quitNow = false;
+    private bool isStarting = true;
 
 	// Use this for initialization
 	void Start () {
@@ -39,6 +44,16 @@ public class InputHandler : MonoBehaviour {
 
     void Update ()
     {
+        if(isStarting)
+        {
+            StartCoroutine(StartUp(fadeTime));
+            isStarting = false;
+        }
+        if(quitNow)
+        {
+            StartCoroutine(StartQuitting(fadeTime));
+            quitNow = false;
+        }
         OVRInput.Update();
         HandleInput();
     }
@@ -48,10 +63,11 @@ public class InputHandler : MonoBehaviour {
         //Currently handling Oculus GO and keyboard input types
 
         // Back is Quit
-        if (OVRInput.GetUp(OVRInput.Button.Back))
+        if (OVRInput.GetUp(OVRInput.Button.Back) || Input.GetKeyUp(KeyCode.Backspace))
         {
             //Debug.Log("GOT BACKBUTTON");
-            Application.Quit();
+            //audioSynth.masterVolume = 0f;
+            quitNow = true;
         }
         //Trackpad Gestures on the OVRInput.Get() 
         if (OVRInput.Get(OVRInput.Button.DpadDown) || Input.GetKeyDown(KeyCode.DownArrow))
@@ -106,5 +122,32 @@ public class InputHandler : MonoBehaviour {
         Vector2 baseBeat = ribbonGenerator.GetSinCos();
         Vector2 halfBeat = ribbonGenerator.GetSinCos(2);
         audioSynth.ProcessAudio(frequencies, baseBeat, halfBeat);
+    }
+
+    private IEnumerator StartQuitting(float duration)
+    {
+        float startTime = Time.time;
+        float t = startTime;
+        while ((t = Time.time) < startTime + duration)
+        {
+            float amt = 1f - ((t - startTime) / duration);
+            audioSynth.masterVolume = amt;
+            objectCloner.transform.localScale = new Vector3(amt, amt, amt);
+            yield return null;
+        }
+        Application.Quit();
+    }
+
+    private IEnumerator StartUp(float duration)
+    {
+        float startTime = Time.time;
+        float t = startTime;
+        while((t = Time.time) < startTime + duration)
+        {
+            float amt = ((t - startTime) / duration);
+            audioSynth.masterVolume = amt;
+            objectCloner.transform.localScale = new Vector3(amt, amt, amt);
+            yield return null;
+        }
     }
 }

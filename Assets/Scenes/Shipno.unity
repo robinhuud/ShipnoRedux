@@ -156,12 +156,13 @@ MonoBehaviour:
   - {fileID: 2800000, guid: 7cfb505f51d6cad41af46ad3fd14592f, type: 3}
   - {fileID: 2800000, guid: 9d0f0a3e5e89e4648acf2b143d193374, type: 3}
   - {fileID: 2800000, guid: 08b2c1db4e850fc49a312e695cf45e72, type: 3}
-  - {fileID: 2800000, guid: 9b30fcf594c2bd84ab3a58cae413d702, type: 3}
+  - {fileID: 2800000, guid: 83e297bf3c2b4b54bb7c8e48f5c3e515, type: 3}
   - {fileID: 2800000, guid: bc20681e2f84b8d49b6624ba1b3d91c1, type: 3}
   - {fileID: 2800000, guid: c0ccb7257aa9a584998182f020727150, type: 3}
   - {fileID: 2800000, guid: b9d9b03948a64c542897ba71c6bfe0b2, type: 3}
-  - {fileID: 2800000, guid: 07f5a207938adfa4c90a6a946cf0f881, type: 3}
-  numClones: 8
+  - {fileID: 2800000, guid: 2cda054b8e9221240b62b904a1ce9bc0, type: 3}
+  - {fileID: 2800000, guid: 9b30fcf594c2bd84ab3a58cae413d702, type: 3}
+  numClones: 3
   maxClones: 30
   axis: {x: 0, y: 0, z: 1}
 --- !u!4 &25400513
@@ -172,7 +173,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 25400511}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 12}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -430,6 +431,7 @@ MonoBehaviour:
   ribbonGenerator: {fileID: 1259437093}
   objectCloner: {fileID: 25400512}
   audioSynth: {fileID: 1212213651}
+  fadeTime: 2
 --- !u!114 &1212213651
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -445,6 +447,7 @@ MonoBehaviour:
   oscilators:
   - {fileID: 599493693}
   - {fileID: 1736354389}
+  masterVolume: 1
 --- !u!1 &1259437090 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1324116726081602, guid: 84b7babd72cee85458079ffbc28392e1,
@@ -614,15 +617,19 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 114455128382909976, guid: 84b7babd72cee85458079ffbc28392e1,
-        type: 3}
-      propertyPath: timeScale
-      value: 3.14159
+    - target: {fileID: 1324116726081602, guid: 84b7babd72cee85458079ffbc28392e1, type: 3}
+      propertyPath: m_Name
+      value: SingleRibbon
       objectReference: {fileID: 0}
     - target: {fileID: 114455128382909976, guid: 84b7babd72cee85458079ffbc28392e1,
         type: 3}
       propertyPath: ribbonLength
-      value: 96
+      value: 105
+      objectReference: {fileID: 0}
+    - target: {fileID: 114455128382909976, guid: 84b7babd72cee85458079ffbc28392e1,
+        type: 3}
+      propertyPath: timeScale
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4319696221230066, guid: 84b7babd72cee85458079ffbc28392e1, type: 3}
       propertyPath: m_LocalPosition.x
@@ -656,34 +663,21 @@ PrefabInstance:
       propertyPath: m_RootOrder
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 4319696221230066, guid: 84b7babd72cee85458079ffbc28392e1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4319696221230066, guid: 84b7babd72cee85458079ffbc28392e1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4319696221230066, guid: 84b7babd72cee85458079ffbc28392e1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 23686695983364226, guid: 84b7babd72cee85458079ffbc28392e1,
         type: 3}
       propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 23686695983364226, guid: 84b7babd72cee85458079ffbc28392e1,
-        type: 3}
-      propertyPath: m_ReceiveShadows
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 23686695983364226, guid: 84b7babd72cee85458079ffbc28392e1,
-        type: 3}
-      propertyPath: m_CastShadows
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 23686695983364226, guid: 84b7babd72cee85458079ffbc28392e1,
-        type: 3}
-      propertyPath: m_LightProbeUsage
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 23686695983364226, guid: 84b7babd72cee85458079ffbc28392e1,
-        type: 3}
-      propertyPath: m_ReflectionProbeUsage
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 23686695983364226, guid: 84b7babd72cee85458079ffbc28392e1,
-        type: 3}
-      propertyPath: m_DynamicOccludee
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

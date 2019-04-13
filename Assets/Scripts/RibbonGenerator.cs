@@ -5,7 +5,8 @@ using UnityEngine;
 public class RibbonGenerator : MonoBehaviour {
 
     public int ribbonLength = 32;
-    public float timeScale = 20f;
+    public float timeScale = Mathf.PI;
+    public bool autoUpdate = true;
 
     // Public interface for getting a sound-scale frequency from the frequency of the ribbon -100-700ish)
     // this really doesn't belong here
@@ -39,7 +40,7 @@ public class RibbonGenerator : MonoBehaviour {
         frequency = new Vector2(.2f, .13f);
         scale = new Vector2(2f, 2f);
         twirl = new Vector2(.2f, .21f);
-        RandomizeTime();
+        RandomizeTime(.3f);
 	}
 
     Vector3[] GenerateInitialVerts(int length)
@@ -95,14 +96,16 @@ public class RibbonGenerator : MonoBehaviour {
     {
         float d = Time.deltaTime;
         t += (timeScale * d) * Mathf.Cos(t * .0237f);
-        //Debug.Log("Time is " + (float)t);
 
         // Secret sauce
         scale += new Vector2(d * .0537f * Mathf.Cos((t * .6f)), d * .0537f * Mathf.Sin((t * .35f)));
         frequency += new Vector2(d * 0.0037f * Mathf.Cos((t * .023f)), d * 0.0039f * Mathf.Sin((t * .032f)));
         twirl += new Vector2(d * .0063f * Mathf.Cos((t * .103f)), d * .0071f * Mathf.Sin((t * .172f)));
-        UpdateVertexPositions(myMeshFilter.mesh, t, scale, frequency, twirl);
-        UpdateUVPositions(myMeshFilter.mesh, t);
+        if (autoUpdate)
+        {
+            UpdateVertexPositions(myMeshFilter.mesh, t, scale, frequency, twirl);
+            UpdateUVPositions(myMeshFilter.mesh, t);
+        }
     }
 
     // update vertex positions copies the x, and y values of each of the verts to the i-2'th vertex in the list, 

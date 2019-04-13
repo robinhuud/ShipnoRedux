@@ -6,6 +6,7 @@ public class InrtoScript : MonoBehaviour
 {
     public float delayTime = 2f;
     public TMP_Text titleText;
+    public TMP_Text warningText;
     public TMP_Text instructionText;
     public Material leftRightMaterial;
     public Material upDownMaterial;
@@ -21,20 +22,16 @@ public class InrtoScript : MonoBehaviour
         "Press Back - Exit",
         "Swipe Left/Right - Color",
         "Swipe Up/Down - Number",
-        "Press Trigger - Reshape",
+        "Hold Trigger - Reorient",
         "Click Trackpad - Start / Random"
-
     };
-    private string[] titles =
-    {
-        "WARNING:\nThis software may potentially\ntrigger seizures for people with\nphotosensitive epilepsy.\nViewer discretion is advised.",
-        "Psychedelic VR"
-    };
+    private string title = "Whirledelic";
     private int stage = -1;
     private int colorIndex = 0;
     private int lineCount = 1;
     private Material originalMaterial;
     private bool titleUp = false;
+    private bool isOculusGo;
 
     // Start is called before the first frame update
     void Start()
@@ -46,13 +43,17 @@ public class InrtoScript : MonoBehaviour
             OVRManager.display.displayFrequency = 72.0f;
         }
         OVRPlugin.vsyncCount = 0;
+        isOculusGo = (OVRPlugin.productName == "Oculus Go");
         if (titleText == null)
         {
             titleText = GetComponent<TMP_Text>();
         }
         Debug.Assert(titleText != null, "No TextMeshPro object specified or attached");
         Debug.Assert(trackPad != null && trigger != null, "Trackpad and Trigger object not specified");
-        titleText.fontSize = 4f;
+
+        titleText.rectTransform.gameObject.SetActive(false);
+        warningText.fontSize = 3f;
+        warningText.rectTransform.gameObject.SetActive(true);
         originalMaterial = trackPad.GetComponent<MeshRenderer>().sharedMaterial;
         ScriptNext();
         Invoke("ChangeWarningToTitle", delayTime);
@@ -70,33 +71,36 @@ public class InrtoScript : MonoBehaviour
     {
         OVRInput.Update();
 
-        if (OVRInput.Get(OVRInput.Button.DpadRight) || Input.GetKeyDown(KeyCode.RightArrow))
+        if(titleUp)
         {
-            colorIndex = (colorIndex + 1) == colors.Length ? 0 : colorIndex + 1;
-            titleText.color = colors[colorIndex];
-        }
-        if (OVRInput.Get(OVRInput.Button.DpadLeft) || Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-            colorIndex = (colorIndex - 1) == -1 ? colors.Length - 1 : colorIndex - 1;
-            titleText.color = colors[colorIndex];
-        }
-        if (OVRInput.Get(OVRInput.Button.DpadDown) || Input.GetKeyDown(KeyCode.DownArrow))
-        {
-            lineCount = (lineCount - 1) <= 0 ? 1 : lineCount - 1;
-            ChangeTitle(titles[1], lineCount);
-        }
-        if (OVRInput.Get(OVRInput.Button.DpadUp) || Input.GetKeyDown(KeyCode.UpArrow))
-        {
-            lineCount = (lineCount + 1) >= 7 ? 6 : lineCount + 1;
-            ChangeTitle(titles[1], lineCount);
+            if (OVRInput.Get(OVRInput.Button.DpadRight) || Input.GetKeyDown(KeyCode.RightArrow))
+            {
+                colorIndex = (colorIndex + 1) == colors.Length ? 0 : colorIndex + 1;
+                titleText.color = colors[colorIndex];
+            }
+            if (OVRInput.Get(OVRInput.Button.DpadLeft) || Input.GetKeyDown(KeyCode.LeftArrow))
+            {
+                colorIndex = (colorIndex - 1) == -1 ? colors.Length - 1 : colorIndex - 1;
+                titleText.color = colors[colorIndex];
+            }
+            if (OVRInput.Get(OVRInput.Button.DpadDown) || Input.GetKeyDown(KeyCode.DownArrow))
+            {
+                lineCount = (lineCount - 1) <= 0 ? 1 : lineCount - 1;
+                ChangeTitle(title, lineCount);
+            }
+            if (OVRInput.Get(OVRInput.Button.DpadUp) || Input.GetKeyDown(KeyCode.UpArrow))
+            {
+                lineCount = (lineCount + 1) >= 6 ? 5 : lineCount + 1;
+                ChangeTitle(title, lineCount);
+            }
+            if (OVRInput.GetUp(OVRInput.Button.PrimaryTouchpad) || Input.GetKeyUp(KeyCode.R))
+            {
+                AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(1);
+            }
         }
         if (OVRInput.Get(OVRInput.Button.PrimaryIndexTrigger))
         {
             titleText.transform.rotation = (OVRInput.GetLocalControllerRotation(OVRInput.GetActiveController()));
-        }
-        if (OVRInput.GetUp(OVRInput.Button.PrimaryTouchpad) || Input.GetKeyUp(KeyCode.R))
-        {
-            AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(1);
         }
         if(OVRInput.GetUp(OVRInput.Button.Back) || Input.GetKeyUp(KeyCode.Backspace))
         {
@@ -162,8 +166,8 @@ public class InrtoScript : MonoBehaviour
 
     void ChangeWarningToTitle()
     {
+        warningText.rectTransform.gameObject.SetActive(false);
         titleUp = true;
-        titleText.text = titles[1];
-        titleText.fontSize = 14f;
+        titleText.rectTransform.gameObject.SetActive(true);
     }
 }
