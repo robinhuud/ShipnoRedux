@@ -107,7 +107,7 @@ public class InputHandler : MonoBehaviour {
             }
             //Debug.Log("ControllerTwist " + controllerTwist);
             ribbonGenerator.RandomizeTime(speedOverride);
-            ribbonGenerator.transform.rotation = Quaternion.identity;
+            ribbonCloner.transform.rotation = Quaternion.identity;
             ribbonCloner.SetNumber(Random.Range(1, 15));
             ribbonCloner.ChangeColor(Random.Range(-2, 2));
         }
@@ -120,8 +120,7 @@ public class InputHandler : MonoBehaviour {
         } else if (OVRInput.Get(OVRInput.Button.PrimaryIndexTrigger))
         {
             Quaternion rotateBy = Quaternion.Inverse(controllerStartOrientation) * OVRInput.GetLocalControllerRotation(OVRInput.GetActiveController());
-            //Quaternion rotateBy = Quaternion.FromToRotation(controllerStartOrientation * Vector3.forward, OVRInput.GetLocalControllerRotation(OVRInput.GetActiveController())*Vector3.forward);
-            ribbonCloner.transform.rotation = clonerStartOrientation * rotateBy;
+            ribbonCloner.transform.rotation = rotateBy * clonerStartOrientation;
         }
     }
 
