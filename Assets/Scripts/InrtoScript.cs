@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
+using System.Collections;
 
 public class InrtoScript : MonoBehaviour
 {
@@ -32,10 +33,37 @@ public class InrtoScript : MonoBehaviour
     private Material originalMaterial;
     private bool titleUp = false;
     private bool isOculusGo;
+    private Coroutine nextAction;
+    private bool readyToGo = false;
 
     // Start is called before the first frame update
     void Start()
     {
+        // Why do I have to put my Effing API key in plain text in the source code? This is terrible security.
+        Oculus.Platform.Core.Initialize("2829748573732373");
+        Oculus.Platform.Entitlements.IsUserEntitledToApplication().OnComplete(
+            (Oculus.Platform.Message msg) =>
+            {
+                if (msg.IsError)
+                {
+                    Application.Quit();
+                }
+                else
+                {
+                    readyToGo = true;
+                }
+            }
+        );
+        // must be on the Oculus GO (for now)
+        isOculusGo = (OVRPlugin.productName == "Oculus Go");
+        if (isOculusGo)
+        {
+            
+        }
+        else
+        {
+            //Application.Quit();
+        }
 
         if (OVRManager.display != null)  //OVRManager.display exists or it doesn't, no flag to check other than if it's null.
         {
@@ -43,7 +71,6 @@ public class InrtoScript : MonoBehaviour
             OVRManager.display.displayFrequency = 72.0f;
         }
         OVRPlugin.vsyncCount = 0;
-        isOculusGo = (OVRPlugin.productName == "Oculus Go");
         if (titleText == null)
         {
             titleText = GetComponent<TMP_Text>();
@@ -55,8 +82,7 @@ public class InrtoScript : MonoBehaviour
         warningText.fontSize = 3f;
         warningText.rectTransform.gameObject.SetActive(true);
         originalMaterial = trackPad.GetComponent<MeshRenderer>().sharedMaterial;
-        ScriptNext();
-        Invoke("ChangeWarningToTitle", delayTime);
+        nextAction = StartCoroutine(ScriptNext(delayTime));
     }
 
     // Only one script per scene should call these OVRInput methods, but it MUST be before any other scripts
@@ -95,8 +121,20 @@ public class InrtoScript : MonoBehaviour
             }
             if (OVRInput.GetUp(OVRInput.Button.PrimaryTouchpad) || Input.GetKeyUp(KeyCode.R))
             {
-                AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(1);
+                if(readyToGo)
+                {
+                    AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(1);
+                }
             }
+        } else if (OVRInput.GetUp(OVRInput.Button.PrimaryTouchpad) || Input.GetKeyUp(KeyCode.R))
+        {
+            if(Time.time < delayTime)
+            {
+                delayTime = Time.time > 3f ? Time.time : 3f;
+                StopCoroutine(nextAction);
+                nextAction = StartCoroutine(ScriptNext(delayTime));
+            }
+            ChangeWarningToTitle();
         }
         if (OVRInput.Get(OVRInput.Button.PrimaryIndexTrigger))
         {
@@ -112,9 +150,9 @@ public class InrtoScript : MonoBehaviour
         }
     }
 
-    void ScriptNext()
+    IEnumerator ScriptNext(float delayTime)
     {
-        if(stage >= script.Length -1)
+        if (stage >= script.Length - 1)
         {
             stage = 0;
         }
@@ -130,6 +168,10 @@ public class InrtoScript : MonoBehaviour
                 backButton.GetComponent<MeshRenderer>().sharedMaterial = pressClickMaterial;
                 break;
             case 1:
+                if (!titleUp)
+                {
+                    ChangeWarningToTitle();
+                }
                 backButton.GetComponent<MeshRenderer>().sharedMaterial = originalMaterial;
                 trackPad.GetComponent<MeshRenderer>().sharedMaterial = leftRightMaterial;
                 break;
@@ -145,11 +187,11 @@ public class InrtoScript : MonoBehaviour
                 trackPad.GetComponent<MeshRenderer>().sharedMaterial = pressClickMaterial;
                 break;
         }
-
-        Invoke("ScriptNext", delayTime);
-
+        yield return new WaitForSeconds(delayTime);
+        yield return ScriptNext(delayTime);
     }
 
+    // Used for modifying the Title object's count
     void ChangeTitle(string text, int count)
     {
         string builder = "";

@@ -429,9 +429,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ribbonGenerator: {fileID: 1259437093}
-  objectCloner: {fileID: 25400512}
+  ribbonCloner: {fileID: 25400512}
   audioSynth: {fileID: 1212213651}
-  fadeTime: 2
+  fadeTime: 3
 --- !u!114 &1212213651
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -624,7 +624,7 @@ PrefabInstance:
     - target: {fileID: 114455128382909976, guid: 84b7babd72cee85458079ffbc28392e1,
         type: 3}
       propertyPath: ribbonLength
-      value: 105
+      value: 110
       objectReference: {fileID: 0}
     - target: {fileID: 114455128382909976, guid: 84b7babd72cee85458079ffbc28392e1,
         type: 3}

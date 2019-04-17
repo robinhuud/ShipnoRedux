@@ -3,21 +3,24 @@ using System.Collections;
 
 public class InputHandler : MonoBehaviour {
     public RibbonGenerator ribbonGenerator;
-    public ObjectCloner objectCloner;
+    public ObjectCloner ribbonCloner;
     public AudioSynth audioSynth;
     public float fadeTime = 3f;
 
     private bool quitNow = false;
     private bool isStarting = true;
+    private Quaternion controllerStartOrientation;
+    private Quaternion clonerStartOrientation;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
         if(audioSynth == null)
         {
             audioSynth = GetComponent<AudioSynth>();
         }
         if(OVRManager.display != null)  //OVRManager.display exists or it doesn't, no flag to check other than if it's null.
         {
+            // This does not appear to do anything :(
             OVRManager.display.RecenteredPose += Recenter;
             // Oh yeah, 72Hz mode on Oculus Go, why not right?
             OVRManager.display.displayFrequency = 72.0f;
@@ -33,7 +36,7 @@ public class InputHandler : MonoBehaviour {
     {
         // This never gets called!!!!
         Debug.Log("RecenteredPose event");
-        objectCloner.SetAngle(Quaternion.identity);
+        ribbonCloner.SetAngle(Quaternion.identity);
     }
 
     void FixedUpdate()
@@ -73,23 +76,23 @@ public class InputHandler : MonoBehaviour {
         if (OVRInput.Get(OVRInput.Button.DpadDown) || Input.GetKeyDown(KeyCode.DownArrow))
         {
             //Debug.Log("GOT DOWN");
-            objectCloner.SetNumber(objectCloner.GetNumber() - 1);
+            ribbonCloner.SetNumber(ribbonCloner.GetNumber() - 1);
         }
         // Up Swipe Gesture (up arrow) increases arm count by 1
         if (OVRInput.Get(OVRInput.Button.DpadUp) || Input.GetKeyDown(KeyCode.UpArrow))
         {
             //Debug.Log("GOT UP");
-            objectCloner.SetNumber(objectCloner.GetNumber() + 1);
+            ribbonCloner.SetNumber(ribbonCloner.GetNumber() + 1);
         }
         if (OVRInput.Get(OVRInput.Button.DpadLeft) || Input.GetKeyDown(KeyCode.LeftArrow))
         {
             //Debug.Log("GOT LEFT");
-            objectCloner.ChangeColor(-1);
+            ribbonCloner.ChangeColor(-1);
         }
         if (OVRInput.Get(OVRInput.Button.DpadRight) || Input.GetKeyDown(KeyCode.RightArrow))
         {
             //Debug.Log("GOT RIGHT");
-            objectCloner.ChangeColor(1);
+            ribbonCloner.ChangeColor(1);
         }
         if (OVRInput.GetUp(OVRInput.Button.PrimaryTouchpad) || Input.GetKeyDown(KeyCode.R))
         {
@@ -104,14 +107,21 @@ public class InputHandler : MonoBehaviour {
             }
             //Debug.Log("ControllerTwist " + controllerTwist);
             ribbonGenerator.RandomizeTime(speedOverride);
-            objectCloner.SetNumber(Random.Range(1, 15));
-            objectCloner.ChangeColor(Random.Range(-2, 2));
-            objectCloner.SetAngle(Quaternion.identity);
+            ribbonGenerator.transform.rotation = Quaternion.identity;
+            ribbonCloner.SetNumber(Random.Range(1, 15));
+            ribbonCloner.ChangeColor(Random.Range(-2, 2));
         }
-        if(OVRInput.Get(OVRInput.Button.PrimaryIndexTrigger))
+        if(OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger))
         {
-            //Debug.Log("GOT TRIGGER");
-            objectCloner.SetAngle(OVRInput.GetLocalControllerRotation(OVRInput.GetActiveController()));
+            //Debug.Log("GOT TRIGGER DOWN");
+            controllerStartOrientation = OVRInput.GetLocalControllerRotation(OVRInput.GetActiveController());
+            clonerStartOrientation = ribbonCloner.transform.rotation;
+            
+        } else if (OVRInput.Get(OVRInput.Button.PrimaryIndexTrigger))
+        {
+            Quaternion rotateBy = Quaternion.Inverse(controllerStartOrientation) * OVRInput.GetLocalControllerRotation(OVRInput.GetActiveController());
+            //Quaternion rotateBy = Quaternion.FromToRotation(controllerStartOrientation * Vector3.forward, OVRInput.GetLocalControllerRotation(OVRInput.GetActiveController())*Vector3.forward);
+            ribbonCloner.transform.rotation = clonerStartOrientation * rotateBy;
         }
     }
 
@@ -132,7 +142,7 @@ public class InputHandler : MonoBehaviour {
         {
             float amt = 1f - ((t - startTime) / duration);
             audioSynth.masterVolume = amt;
-            objectCloner.transform.localScale = new Vector3(amt, amt, amt);
+            ribbonCloner.transform.localScale = new Vector3(amt, amt, amt);
             yield return null;
         }
         Application.Quit();
@@ -146,7 +156,7 @@ public class InputHandler : MonoBehaviour {
         {
             float amt = ((t - startTime) / duration);
             audioSynth.masterVolume = amt;
-            objectCloner.transform.localScale = new Vector3(amt, amt, amt);
+            ribbonCloner.transform.localScale = new Vector3(amt, amt, amt);
             yield return null;
         }
     }

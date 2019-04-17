@@ -106,6 +106,7 @@ public class ObjectCloner : MonoBehaviour {
 
     private void ReLayout()
     {
+        //this.transform.rotation = Quaternion.identity;
         for (int i = 0; i < numClones; i++)
         {
             this.transform.GetChild(i).SetPositionAndRotation(this.transform.position, Quaternion.AngleAxis(((float)i / (float)(numClones)) * (360f), axis));
