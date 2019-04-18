@@ -110,7 +110,7 @@ public class ObjectCloner : MonoBehaviour {
         for (int i = 0; i < numClones; i++)
         {
             this.transform.GetChild(i).localPosition = Vector3.zero;
-            this.transform.GetChild(i).localRotation = Quaternion.AngleAxis(((float)i / (float)(numClones)) * (360f), axis);
+            this.transform.GetChild(i).localRotation = Quaternion.AngleAxis(((float)i / (float)(numClones)) * (360f), axis); 
         }
         dirty = false;
     }

@@ -109,7 +109,7 @@ public class InputHandler : MonoBehaviour {
             ribbonGenerator.RandomizeTime(speedOverride);
             ribbonCloner.transform.rotation = Quaternion.identity;
             ribbonCloner.SetNumber(Random.Range(1, 15));
-            ribbonCloner.ChangeColor(Random.Range(-2, 2));
+            ribbonCloner.ChangeColor(Random.Range(-2, 2)); 
         }
         if(OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger))
         {
