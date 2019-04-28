@@ -15,6 +15,8 @@ public class InrtoScript : MonoBehaviour
     public GameObject trackPad;
     public GameObject trigger;
     public GameObject backButton;
+    public Texture activeColor;
+    public Texture selectedColor;
     [SerializeField]
     public Color32[] colors;
 
@@ -31,10 +33,12 @@ public class InrtoScript : MonoBehaviour
     private int colorIndex = 0;
     private int lineCount = 1;
     private Material originalMaterial;
+    private Material currentActiveMaterial;
     private bool titleUp = false;
     private bool isOculusGo;
     private Coroutine nextAction;
     private bool readyToGo = false;
+    private bool flashColor;
 
     // Start is called before the first frame update
     void Start()
@@ -82,6 +86,8 @@ public class InrtoScript : MonoBehaviour
         warningText.fontSize = 3f;
         warningText.rectTransform.gameObject.SetActive(true);
         originalMaterial = trackPad.GetComponent<MeshRenderer>().sharedMaterial;
+        currentActiveMaterial = pressClickMaterial;
+        currentActiveMaterial.SetTexture("colorMap", activeColor);
         nextAction = StartCoroutine(ScriptNext(delayTime));
     }
 
@@ -103,21 +109,25 @@ public class InrtoScript : MonoBehaviour
             {
                 colorIndex = (colorIndex + 1) == colors.Length ? 0 : colorIndex + 1;
                 titleText.color = colors[colorIndex];
+                flashColor = true;
             }
             if (OVRInput.Get(OVRInput.Button.DpadLeft) || Input.GetKeyDown(KeyCode.LeftArrow))
             {
                 colorIndex = (colorIndex - 1) == -1 ? colors.Length - 1 : colorIndex - 1;
                 titleText.color = colors[colorIndex];
+                flashColor = true;
             }
             if (OVRInput.Get(OVRInput.Button.DpadDown) || Input.GetKeyDown(KeyCode.DownArrow))
             {
                 lineCount = (lineCount - 1) <= 0 ? 1 : lineCount - 1;
                 ChangeTitle(title, lineCount);
+                flashColor = true;
             }
             if (OVRInput.Get(OVRInput.Button.DpadUp) || Input.GetKeyDown(KeyCode.UpArrow))
             {
                 lineCount = (lineCount + 1) >= 6 ? 5 : lineCount + 1;
                 ChangeTitle(title, lineCount);
+                flashColor = true;
             }
             if (OVRInput.GetUp(OVRInput.Button.PrimaryTouchpad) || Input.GetKeyUp(KeyCode.R))
             {
@@ -144,6 +154,11 @@ public class InrtoScript : MonoBehaviour
         {
             Application.Quit();
         }
+        if(flashColor)
+        {
+            StartCoroutine(DoColorFlash());
+            flashColor = false;
+        }
         if (titleUp)
         {
             titleText.outlineWidth = .1f + (Mathf.Sin(Time.time * 10f * Mathf.PI) + 1f) * .05f;
@@ -166,6 +181,8 @@ public class InrtoScript : MonoBehaviour
             case 0:
                 trackPad.GetComponent<MeshRenderer>().sharedMaterial = originalMaterial;
                 backButton.GetComponent<MeshRenderer>().sharedMaterial = pressClickMaterial;
+                currentActiveMaterial.SetTexture("colorMap", activeColor);
+                currentActiveMaterial = pressClickMaterial;
                 break;
             case 1:
                 if (!titleUp)
@@ -174,13 +191,19 @@ public class InrtoScript : MonoBehaviour
                 }
                 backButton.GetComponent<MeshRenderer>().sharedMaterial = originalMaterial;
                 trackPad.GetComponent<MeshRenderer>().sharedMaterial = leftRightMaterial;
+                currentActiveMaterial.SetTexture("colorMap", activeColor);
+                currentActiveMaterial = leftRightMaterial;
                 break;
             case 2:
                 trackPad.GetComponent<MeshRenderer>().sharedMaterial = upDownMaterial;
+                currentActiveMaterial.SetTexture("colorMap", activeColor);
+                currentActiveMaterial = upDownMaterial;
                 break;
             case 3:
                 trackPad.GetComponent<MeshRenderer>().sharedMaterial = originalMaterial;
                 trigger.GetComponent<MeshRenderer>().sharedMaterial = pressClickMaterial;
+                currentActiveMaterial.SetTexture("colorMap", activeColor);
+                currentActiveMaterial = pressClickMaterial;
                 break;
             case 4:
                 trigger.GetComponent<MeshRenderer>().sharedMaterial = originalMaterial;
@@ -204,6 +227,18 @@ public class InrtoScript : MonoBehaviour
             }
         }
         titleText.text = builder;
+    }
+
+    IEnumerator DoColorFlash()
+    {
+        Material target = currentActiveMaterial;
+        if(target.GetTexture("colorMap") == activeColor)
+        {
+            target.SetTexture("colorMap", selectedColor);
+            yield return new WaitForSeconds(.25f);
+            target.SetTexture("colorMap", activeColor);
+        }
+        yield return null;
     }
 
     void ChangeWarningToTitle()

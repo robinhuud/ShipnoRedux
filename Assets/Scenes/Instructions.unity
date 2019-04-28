@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -237,8 +237,8 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_text: WARNING:\nThis software may potentially\ntrigger seizures for people with\nphotosensitive
-    epilepsy.\nViewer discretion is advised.
+  m_text: WARNING:\n\nTHIS SOFTWARE MAY POTENTIALLY\nTRIGGER SEIZURES FOR PEOPLE WITH\nPHOTOSENSITIVE
+    EPILEPSY.\n\nViewer discretion is advised.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -284,7 +284,7 @@ MonoBehaviour:
   m_enableWordWrapping: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
-  m_firstOverflowCharacterIndex: 39
+  m_firstOverflowCharacterIndex: 10
   m_linkedTextComponent: {fileID: 0}
   m_isLinkedTextComponent: 0
   m_isTextTruncated: 0
@@ -307,12 +307,12 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 2.8589516, w: 0}
   m_textInfo:
     textComponent: {fileID: 0}
-    characterCount: 126
+    characterCount: 128
     spriteCount: 0
-    spaceCount: 15
+    spaceCount: 17
     wordCount: 16
     linkCount: 0
-    lineCount: 5
+    lineCount: 7
     pageCount: 1
     materialCount: 1
   m_havePropertiesChanged: 0
@@ -548,13 +548,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1317172967}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0.15746865, y: 0, z: 0, w: 0.98752403}
   m_LocalPosition: {x: 0, y: 1, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 18.12, y: 0, z: 0}
 --- !u!1 &1390660004
 GameObject:
   m_ObjectHideFlags: 0
@@ -594,6 +594,8 @@ MonoBehaviour:
   trackPad: {fileID: 1277533023}
   trigger: {fileID: 1277533021}
   backButton: {fileID: 1277533015}
+  activeColor: {fileID: 2800000, guid: 612fa4e5f8ef5404695d4d9d923b8d5e, type: 3}
+  selectedColor: {fileID: 2800000, guid: 9613e512b11b5964397bfc380465a2d9, type: 3}
   colors:
   - serializedVersion: 2
     rgba: 4278235877
@@ -924,11 +926,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4126154273842041876, guid: c0aa2f2da8129d14cb057c11b8fc273b,
-        type: 3}
-      propertyPath: m_Mesh
-      value: 
-      objectReference: {fileID: 0}
     - target: {fileID: 4126154273842041878, guid: c0aa2f2da8129d14cb057c11b8fc273b,
         type: 3}
       propertyPath: m_havePropertiesChanged
@@ -938,6 +935,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_isInputParsingRequired
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4126154273842041876, guid: c0aa2f2da8129d14cb057c11b8fc273b,
+        type: 3}
+      propertyPath: m_Mesh
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 4126154273842041874, guid: c0aa2f2da8129d14cb057c11b8fc273b,
         type: 3}
