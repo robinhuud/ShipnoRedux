@@ -64,7 +64,10 @@ public class InputHandler : MonoBehaviour {
     private void HandleInput()
     {
         //Currently handling Oculus GO and keyboard input types
+        Quaternion controllerLocalRotation = OVRInput.GetLocalControllerRotation(OVRInput.GetActiveController());
+        bool hasController = (controllerLocalRotation != Quaternion.identity);
 
+        // Controller discreet events, use else if because we don't want to double count clickUp as touchUp
         // Back is Quit
         if (OVRInput.GetUp(OVRInput.Button.Back) || Input.GetKeyUp(KeyCode.Backspace))
         {
@@ -73,43 +76,52 @@ public class InputHandler : MonoBehaviour {
             quitNow = true;
         }
         //Trackpad Gestures on the OVRInput.Get() 
-        if (OVRInput.Get(OVRInput.Button.DpadDown) || Input.GetKeyDown(KeyCode.DownArrow))
+        else if (OVRInput.Get(OVRInput.Button.DpadDown) || Input.GetKeyDown(KeyCode.DownArrow))
         {
             //Debug.Log("GOT DOWN");
             ribbonCloner.SetNumber(ribbonCloner.GetNumber() - 1);
         }
         // Up Swipe Gesture (up arrow) increases arm count by 1
-        if (OVRInput.Get(OVRInput.Button.DpadUp) || Input.GetKeyDown(KeyCode.UpArrow))
+        else if (OVRInput.Get(OVRInput.Button.DpadUp) || Input.GetKeyDown(KeyCode.UpArrow))
         {
             //Debug.Log("GOT UP");
             ribbonCloner.SetNumber(ribbonCloner.GetNumber() + 1);
         }
-        if (OVRInput.Get(OVRInput.Button.DpadLeft) || Input.GetKeyDown(KeyCode.LeftArrow))
+        else if (OVRInput.Get(OVRInput.Button.DpadLeft) || Input.GetKeyDown(KeyCode.LeftArrow))
         {
             //Debug.Log("GOT LEFT");
             ribbonCloner.ChangeColor(-1);
         }
-        if (OVRInput.Get(OVRInput.Button.DpadRight) || Input.GetKeyDown(KeyCode.RightArrow))
+        else if (OVRInput.Get(OVRInput.Button.DpadRight) || Input.GetKeyDown(KeyCode.RightArrow))
         {
             //Debug.Log("GOT RIGHT");
             ribbonCloner.ChangeColor(1);
         }
-        if (OVRInput.GetUp(OVRInput.Button.PrimaryTouchpad) || Input.GetKeyDown(KeyCode.R))
+        else if (OVRInput.GetUp(OVRInput.Button.PrimaryTouchpad) || Input.GetKeyDown(KeyCode.R))
         {
             //Debug.Log("GOT TRACKPAD CLICK");
             float speedOverride = -1f;
-            Quaternion controllerLocalRotation = OVRInput.GetLocalControllerRotation(OVRInput.GetActiveController());
-            if(controllerLocalRotation != Quaternion.identity)
+            if(hasController)
             {
                 speedOverride = controllerLocalRotation.eulerAngles.z;
                 // Convert in to range of 0-1
                 speedOverride = 1f - (speedOverride > 180f ? (180f - speedOverride) / 360f: (360f - speedOverride) / 360f + .5f);
             }
             //Debug.Log("ControllerTwist " + controllerTwist);
-            ribbonGenerator.RandomizeTime(speedOverride);
+            ribbonGenerator.SetScaledTime(speedOverride);
             ribbonCloner.transform.rotation = Quaternion.identity;
             ribbonCloner.SetNumber(Random.Range(1, 15));
             ribbonCloner.ChangeColor(Random.Range(-2, 2)); 
+        }
+        else if(OVRInput.GetUp(OVRInput.Touch.PrimaryTouchpad) || Input.GetKeyDown(KeyCode.S))
+        {
+            float speedOverride = -1f;
+            if(hasController) // Only works with controller, no PC control for this.
+            {
+                speedOverride = controllerLocalRotation.eulerAngles.z;
+                speedOverride = 1f - (speedOverride > 180f ? (180f - speedOverride) / 360f : (360f - speedOverride) / 360f + .5f);
+            }
+            ribbonGenerator.SetScaledTime(speedOverride);
         }
         if(OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger))
         {

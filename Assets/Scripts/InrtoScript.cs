@@ -38,7 +38,7 @@ public class InrtoScript : MonoBehaviour
     private bool isOculusGo;
     private Coroutine nextAction;
     private bool readyToGo = false;
-    private bool flashColor;
+    private bool actionFeedback;
 
     // Start is called before the first frame update
     void Start()
@@ -108,26 +108,26 @@ public class InrtoScript : MonoBehaviour
             if (OVRInput.Get(OVRInput.Button.DpadRight) || Input.GetKeyDown(KeyCode.RightArrow))
             {
                 colorIndex = (colorIndex + 1) == colors.Length ? 0 : colorIndex + 1;
-                titleText.color = colors[colorIndex];
-                flashColor = true;
+                UpdateTitleColor();
+                actionFeedback = true;
             }
             if (OVRInput.Get(OVRInput.Button.DpadLeft) || Input.GetKeyDown(KeyCode.LeftArrow))
             {
                 colorIndex = (colorIndex - 1) == -1 ? colors.Length - 1 : colorIndex - 1;
-                titleText.color = colors[colorIndex];
-                flashColor = true;
+                UpdateTitleColor();
+                actionFeedback = true;
             }
             if (OVRInput.Get(OVRInput.Button.DpadDown) || Input.GetKeyDown(KeyCode.DownArrow))
             {
                 lineCount = (lineCount - 1) <= 0 ? 1 : lineCount - 1;
-                ChangeTitle(title, lineCount);
-                flashColor = true;
+                UpdateTitleCount(title, lineCount);
+                actionFeedback = true;
             }
             if (OVRInput.Get(OVRInput.Button.DpadUp) || Input.GetKeyDown(KeyCode.UpArrow))
             {
                 lineCount = (lineCount + 1) >= 6 ? 5 : lineCount + 1;
-                ChangeTitle(title, lineCount);
-                flashColor = true;
+                UpdateTitleCount(title, lineCount);
+                actionFeedback = true;
             }
             if (OVRInput.GetUp(OVRInput.Button.PrimaryTouchpad) || Input.GetKeyUp(KeyCode.R))
             {
@@ -154,10 +154,10 @@ public class InrtoScript : MonoBehaviour
         {
             Application.Quit();
         }
-        if(flashColor)
+        if(actionFeedback)
         {
-            StartCoroutine(DoColorFlash());
-            flashColor = false;
+            StartCoroutine(ActionFeedback());
+            actionFeedback = false;
         }
         if (titleUp)
         {
@@ -215,7 +215,7 @@ public class InrtoScript : MonoBehaviour
     }
 
     // Used for modifying the Title object's count
-    void ChangeTitle(string text, int count)
+    void UpdateTitleCount(string text, int count)
     {
         string builder = "";
         for(int i = 0; i < count; i++)
@@ -229,7 +229,13 @@ public class InrtoScript : MonoBehaviour
         titleText.text = builder;
     }
 
-    IEnumerator DoColorFlash()
+    void UpdateTitleColor()
+    {
+        titleText.faceColor = colors[colorIndex];
+        titleText.outlineColor = new Color32((byte)(colors[colorIndex].r *.35), (byte)(colors[colorIndex].g * .35), (byte)(colors[colorIndex].b * .35), colors[colorIndex].a);
+    }
+
+    IEnumerator ActionFeedback()
     {
         Material target = currentActiveMaterial;
         if(target.GetTexture("colorMap") == activeColor)
@@ -246,5 +252,6 @@ public class InrtoScript : MonoBehaviour
         warningText.rectTransform.gameObject.SetActive(false);
         titleUp = true;
         titleText.rectTransform.gameObject.SetActive(true);
+        UpdateTitleColor();
     }
 }

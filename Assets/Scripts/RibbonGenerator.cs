@@ -6,6 +6,7 @@ public class RibbonGenerator : MonoBehaviour {
 
     public int ribbonLength = 32;
     public float timeScale = Mathf.PI;
+    public float deltaScale = 20f;
     public bool autoUpdate = true;
 
     // Public interface for getting a sound-scale frequency from the frequency of the ribbon -100-700ish)
@@ -26,10 +27,12 @@ public class RibbonGenerator : MonoBehaviour {
     private Vector2 frequency;
     private Vector2 twirl;
     private float t;
+    private float targetT;
     private MeshFilter myMeshFilter;
+    private bool targeting = false;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
         //Debug.Log("Ribbongenerator start");
         Mesh mesh = new Mesh();
         myMeshFilter = GetComponent<MeshFilter>();
@@ -40,13 +43,13 @@ public class RibbonGenerator : MonoBehaviour {
         frequency = new Vector2(.2f, .13f);
         scale = new Vector2(2f, 2f);
         twirl = new Vector2(.2f, .21f);
-        RandomizeTime(.3f);
+        t = 700f + Random.value * 100f;
 	}
 
     Vector3[] GenerateInitialVerts(int length)
     {
         Vector3[] newVerts = new Vector3[2 * length];
-        // These starting values are just placeholders to get the 
+        // These starting values are just placeholders to get the length right
         for(int i = 0; i < length; i++)
         {
             newVerts[2 * i] = new Vector3(Mathf.Cos((float)i * .2f), Mathf.Sin((float)i * .16f), (length / 4) - (float)i * .5f);
@@ -83,19 +86,44 @@ public class RibbonGenerator : MonoBehaviour {
         return newTriangles;
     }
 
-    public void RandomizeTime(float cheat = -1f)
+    public void SetScaledTime(float cheat = -1f)
     {
         // This basically changes the "speed" of the overall simulation, "cheat" value can be passed in to force a particular outcome
-        t = 50f * (1f / Time.deltaTime * (cheat == -1 ? Random.value : cheat)); // Using 1/Time.deltaTime just for some extra non-determinism usually between 60 and 200
-
+        t = 25f + 50f * (1f / Time.deltaTime) * (cheat == -1 ? Random.value : cheat); // Using 1/Time.deltaTime usually between 60 and 200, on the headset it should be locked at 72
+        targeting = false;
         //Debug.Log("New T:" + t);
+    }
+    public void NudgeTowardTime(float target)
+    {
+        targeting = true;
+        targetT = 50f * (1f / Time.deltaTime) * target;
     }
 
     // Update is called once per frame
     void Update()
     {
-        float d = Time.deltaTime;
-        t += (timeScale * d) * Mathf.Cos(t * .0237f);
+        float d = Time.deltaTime * timeScale;
+        if(targeting)
+        {
+            float delta = t - targetT;
+            if (delta > d * deltaScale)
+            {
+                t -= d * deltaScale;
+            }
+            else if ( delta < -d * deltaScale)
+            {
+                t += d * deltaScale;
+            }
+            else
+            {
+                targeting = false;
+            }
+            Debug.Log(targetT + "  " + t);
+        }
+        else
+        {
+            t += d * Mathf.Cos(t * .0237f);
+        }
 
         // Secret sauce
         scale += new Vector2(d * .0537f * Mathf.Cos((t * .6f)), d * .0537f * Mathf.Sin((t * .35f)));
