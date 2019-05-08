@@ -12,6 +12,7 @@ public class InrtoScript : MonoBehaviour
     public Material leftRightMaterial;
     public Material upDownMaterial;
     public Material pressClickMaterial;
+    public Material multiTapMaterial;
     public GameObject trackPad;
     public GameObject trigger;
     public GameObject backButton;
@@ -20,13 +21,14 @@ public class InrtoScript : MonoBehaviour
     [SerializeField]
     public Color32[] colors;
 
-    private string[] script = 
+    private string[] script =
     {
         "Press Back - Exit",
         "Swipe Left/Right - Color",
         "Swipe Up/Down - Number",
         "Hold Trigger - Reorient",
-        "Click Trackpad - Start / Random"
+        "Tap Trackpad - Change Width / Intensity",
+        "Click Trackpad - Start / Randomize"
     };
     private string title = "Whirledelic";
     private int stage = -1;
@@ -39,7 +41,9 @@ public class InrtoScript : MonoBehaviour
     private Coroutine nextAction;
     private bool readyToGo = false;
     private bool actionFeedback;
-
+    private Vector2 touchPosition;
+    private float outlineScale = .1f;
+    private float outlineWiggle = 31f;
     // Start is called before the first frame update
     void Start()
     {
@@ -105,36 +109,39 @@ public class InrtoScript : MonoBehaviour
 
         if(titleUp)
         {
-            if (OVRInput.Get(OVRInput.Button.DpadRight) || Input.GetKeyDown(KeyCode.RightArrow))
+            if (OVRInput.Get(OVRInput.Button.DpadRight) || Input.GetKeyUp(KeyCode.RightArrow))
             {
                 colorIndex = (colorIndex + 1) == colors.Length ? 0 : colorIndex + 1;
                 UpdateTitleColor();
                 actionFeedback = true;
-            }
-            if (OVRInput.Get(OVRInput.Button.DpadLeft) || Input.GetKeyDown(KeyCode.LeftArrow))
+            } else if (OVRInput.Get(OVRInput.Button.DpadLeft) || Input.GetKeyUp(KeyCode.LeftArrow))
             {
                 colorIndex = (colorIndex - 1) == -1 ? colors.Length - 1 : colorIndex - 1;
                 UpdateTitleColor();
                 actionFeedback = true;
-            }
-            if (OVRInput.Get(OVRInput.Button.DpadDown) || Input.GetKeyDown(KeyCode.DownArrow))
+            } else if (OVRInput.Get(OVRInput.Button.DpadDown) || Input.GetKeyUp(KeyCode.DownArrow))
             {
                 lineCount = (lineCount - 1) <= 0 ? 1 : lineCount - 1;
                 UpdateTitleCount(title, lineCount);
                 actionFeedback = true;
-            }
-            if (OVRInput.Get(OVRInput.Button.DpadUp) || Input.GetKeyDown(KeyCode.UpArrow))
+            } else if(OVRInput.Get(OVRInput.Button.DpadUp) || Input.GetKeyUp(KeyCode.UpArrow))
             {
                 lineCount = (lineCount + 1) >= 6 ? 5 : lineCount + 1;
                 UpdateTitleCount(title, lineCount);
                 actionFeedback = true;
-            }
-            if (OVRInput.GetUp(OVRInput.Button.PrimaryTouchpad) || Input.GetKeyUp(KeyCode.R))
+            } else if (OVRInput.GetUp(OVRInput.Button.PrimaryTouchpad) || Input.GetKeyUp(KeyCode.R))
             {
                 if(readyToGo)
                 {
                     AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(1);
                 }
+            } else if(OVRInput.Get(OVRInput.Touch.PrimaryTouchpad))
+            {
+                touchPosition = OVRInput.Get(OVRInput.Axis2D.PrimaryTouchpad);
+            } else if(OVRInput.GetUp(OVRInput.Touch.PrimaryTouchpad) || Input.GetKeyUp(KeyCode.S))
+            {
+                outlineScale = .03f + (touchPosition.y + 1f) * .05f;
+                outlineWiggle = (touchPosition.x + 1f) * 20f;
             }
         } else if (OVRInput.GetUp(OVRInput.Button.PrimaryTouchpad) || Input.GetKeyUp(KeyCode.R))
         {
@@ -161,7 +168,7 @@ public class InrtoScript : MonoBehaviour
         }
         if (titleUp)
         {
-            titleText.outlineWidth = .1f + (Mathf.Sin(Time.time * 10f * Mathf.PI) + 1f) * .05f;
+            titleText.outlineWidth = outlineScale * 2f + (Mathf.Sin(Time.time * outlineWiggle) + 1f) * outlineScale;
         }
     }
 
@@ -207,7 +214,14 @@ public class InrtoScript : MonoBehaviour
                 break;
             case 4:
                 trigger.GetComponent<MeshRenderer>().sharedMaterial = originalMaterial;
+                trackPad.GetComponent<MeshRenderer>().sharedMaterial = multiTapMaterial;
+                currentActiveMaterial.SetTexture("colorMap", activeColor);
+                currentActiveMaterial = multiTapMaterial;
+                break;
+            case 5:
                 trackPad.GetComponent<MeshRenderer>().sharedMaterial = pressClickMaterial;
+                currentActiveMaterial.SetTexture("colorMap", activeColor);
+                currentActiveMaterial = pressClickMaterial;
                 break;
         }
         yield return new WaitForSeconds(delayTime);

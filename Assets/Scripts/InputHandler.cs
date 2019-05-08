@@ -11,6 +11,7 @@ public class InputHandler : MonoBehaviour {
     private bool isStarting = true;
     private Quaternion controllerStartOrientation;
     private Quaternion clonerStartOrientation;
+    private Vector2 touchCoords;
 
     // Use this for initialization
     void Start () {
@@ -76,52 +77,53 @@ public class InputHandler : MonoBehaviour {
             quitNow = true;
         }
         //Trackpad Gestures on the OVRInput.Get() 
-        else if (OVRInput.Get(OVRInput.Button.DpadDown) || Input.GetKeyDown(KeyCode.DownArrow))
+        else if (OVRInput.Get(OVRInput.Button.DpadDown) || Input.GetKeyUp(KeyCode.DownArrow))
         {
             //Debug.Log("GOT DOWN");
             ribbonCloner.SetNumber(ribbonCloner.GetNumber() - 1);
         }
         // Up Swipe Gesture (up arrow) increases arm count by 1
-        else if (OVRInput.Get(OVRInput.Button.DpadUp) || Input.GetKeyDown(KeyCode.UpArrow))
+        else if (OVRInput.Get(OVRInput.Button.DpadUp) || Input.GetKeyUp(KeyCode.UpArrow))
         {
             //Debug.Log("GOT UP");
             ribbonCloner.SetNumber(ribbonCloner.GetNumber() + 1);
         }
-        else if (OVRInput.Get(OVRInput.Button.DpadLeft) || Input.GetKeyDown(KeyCode.LeftArrow))
+        else if (OVRInput.Get(OVRInput.Button.DpadLeft) || Input.GetKeyUp(KeyCode.LeftArrow))
         {
             //Debug.Log("GOT LEFT");
             ribbonCloner.ChangeColor(-1);
         }
-        else if (OVRInput.Get(OVRInput.Button.DpadRight) || Input.GetKeyDown(KeyCode.RightArrow))
+        else if (OVRInput.Get(OVRInput.Button.DpadRight) || Input.GetKeyUp(KeyCode.RightArrow))
         {
             //Debug.Log("GOT RIGHT");
             ribbonCloner.ChangeColor(1);
         }
-        else if (OVRInput.GetUp(OVRInput.Button.PrimaryTouchpad) || Input.GetKeyDown(KeyCode.R))
+        else if (OVRInput.GetUp(OVRInput.Button.PrimaryTouchpad) || Input.GetKeyUp(KeyCode.R))
         {
             //Debug.Log("GOT TRACKPAD CLICK");
-            float speedOverride = -1f;
-            if(hasController)
-            {
-                speedOverride = controllerLocalRotation.eulerAngles.z;
-                // Convert in to range of 0-1
-                speedOverride = 1f - (speedOverride > 180f ? (180f - speedOverride) / 360f: (360f - speedOverride) / 360f + .5f);
-            }
-            //Debug.Log("ControllerTwist " + controllerTwist);
-            ribbonGenerator.SetScaledTime(speedOverride);
+            ribbonGenerator.SetScaledTime(-1f);
             ribbonCloner.transform.rotation = Quaternion.identity;
             ribbonCloner.SetNumber(Random.Range(1, 15));
             ribbonCloner.ChangeColor(Random.Range(-2, 2)); 
         }
-        else if(OVRInput.GetUp(OVRInput.Touch.PrimaryTouchpad) || Input.GetKeyDown(KeyCode.S))
+        else if (OVRInput.Get(OVRInput.Touch.PrimaryTouchpad))
+        {
+            touchCoords = OVRInput.Get(OVRInput.Axis2D.PrimaryTouchpad);
+        }
+        else if(OVRInput.GetUp(OVRInput.Touch.PrimaryTouchpad) || Input.GetKeyUp(KeyCode.S))
         {
             float speedOverride = -1f;
+            float widthOverride = -1f;
             if(hasController) // Only works with controller, no PC control for this.
             {
-                speedOverride = controllerLocalRotation.eulerAngles.z;
-                speedOverride = 1f - (speedOverride > 180f ? (180f - speedOverride) / 360f : (360f - speedOverride) / 360f + .5f);
+                //speedOverride = controllerLocalRotation.eulerAngles.z;
+                //speedOverride = 1f - (speedOverride > 180f ? (180f - speedOverride) / 360f : (360f - speedOverride) / 360f + .5f);
+                //Debug.Log("speedSet " + touchCoords);
+                speedOverride = (touchCoords.x + 1f) / 2f;
+                widthOverride = (touchCoords.y + 1.2f) / 2.1f;
             }
             ribbonGenerator.SetScaledTime(speedOverride);
+            ribbonGenerator.SetWidthOverride(widthOverride);
         }
         if(OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger))
         {
@@ -131,8 +133,13 @@ public class InputHandler : MonoBehaviour {
             
         } else if (OVRInput.Get(OVRInput.Button.PrimaryIndexTrigger))
         {
+            // slowly drift back to center when not grabbing
             Quaternion rotateBy = Quaternion.Inverse(controllerStartOrientation) * OVRInput.GetLocalControllerRotation(OVRInput.GetActiveController());
             ribbonCloner.transform.rotation = rotateBy * clonerStartOrientation;
+        }
+        else
+        {
+            ribbonCloner.transform.rotation = Quaternion.RotateTowards(ribbonCloner.transform.rotation, Quaternion.identity, .05f);
         }
     }
 

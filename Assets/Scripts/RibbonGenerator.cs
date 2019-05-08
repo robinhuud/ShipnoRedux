@@ -93,6 +93,13 @@ public class RibbonGenerator : MonoBehaviour {
         targeting = false;
         //Debug.Log("New T:" + t);
     }
+    public void SetWidthOverride(float newValue = -1f)
+    {
+        if(newValue != -1)
+        {
+            this.twirl = new Vector2(newValue, newValue);
+        }
+    }
     public void NudgeTowardTime(float target)
     {
         targeting = true;

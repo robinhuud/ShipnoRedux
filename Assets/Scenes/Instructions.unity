@@ -591,6 +591,7 @@ MonoBehaviour:
   leftRightMaterial: {fileID: 2100000, guid: 68506cbe6be497246a06fd477d108452, type: 2}
   upDownMaterial: {fileID: 2100000, guid: 9ca9e304ec420d748b6c7b1df6f05b4a, type: 2}
   pressClickMaterial: {fileID: 2100000, guid: 9e092dd31c18f9646b03f534ba7c52ad, type: 2}
+  multiTapMaterial: {fileID: 2100000, guid: 3eb0ffeab788dae4a8af233c6028b193, type: 2}
   trackPad: {fileID: 1277533023}
   trigger: {fileID: 1277533021}
   backButton: {fileID: 1277533015}
@@ -935,6 +936,26 @@ PrefabInstance:
         type: 3}
       propertyPath: m_isInputParsingRequired
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4126154273842041878, guid: c0aa2f2da8129d14cb057c11b8fc273b,
+        type: 3}
+      propertyPath: m_text
+      value: Tap Trackpad - Change Width / Intensity
+      objectReference: {fileID: 0}
+    - target: {fileID: 4126154273842041878, guid: c0aa2f2da8129d14cb057c11b8fc273b,
+        type: 3}
+      propertyPath: m_textInfo.characterCount
+      value: 39
+      objectReference: {fileID: 0}
+    - target: {fileID: 4126154273842041878, guid: c0aa2f2da8129d14cb057c11b8fc273b,
+        type: 3}
+      propertyPath: m_textInfo.spaceCount
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 4126154273842041878, guid: c0aa2f2da8129d14cb057c11b8fc273b,
+        type: 3}
+      propertyPath: m_textInfo.wordCount
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 4126154273842041876, guid: c0aa2f2da8129d14cb057c11b8fc273b,
         type: 3}

@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: ActiveButtonMaterial
+  m_Name: MultiTapTrackpad
   m_Shader: {fileID: 4800000, guid: 63afea768b572c34d9373c84cb778786, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
@@ -40,7 +40,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: eac06951186e20142884ca5acafe175d, type: 3}
+        m_Texture: {fileID: 2800000, guid: 6b81a746c1069284d8e90ca79ab3a240, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -61,7 +61,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     - colorMap:
         m_Texture: {fileID: 2800000, guid: 612fa4e5f8ef5404695d4d9d923b8d5e, type: 3}
-        m_Scale: {x: 1, y: 1}
+        m_Scale: {x: 2, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _BumpScale: 1
