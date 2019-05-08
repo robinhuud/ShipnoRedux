@@ -23,12 +23,13 @@ public class InrtoScript : MonoBehaviour
 
     private string[] script =
     {
-        "Press Back - Exit",
+        "Click - Skip Intro",
         "Swipe Left/Right - Color",
         "Swipe Up/Down - Number",
         "Hold Trigger - Reorient",
         "Tap Trackpad - Change Width / Intensity",
-        "Click Trackpad - Start / Randomize"
+        "Click Trackpad - Start / Randomize",
+        "Back Button - Exit"
     };
     private string title = "Whirledelic";
     private int stage = -1;
@@ -55,6 +56,7 @@ public class InrtoScript : MonoBehaviour
                 if (msg.IsError)
                 {
                     Application.Quit();
+                    Debug.Log("Tried to quit");
                 }
                 else
                 {
@@ -133,6 +135,7 @@ public class InrtoScript : MonoBehaviour
             {
                 if(readyToGo)
                 {
+                    Debug.Log("Trying");
                     AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(1);
                 }
             } else if(OVRInput.Get(OVRInput.Touch.PrimaryTouchpad))
@@ -186,8 +189,8 @@ public class InrtoScript : MonoBehaviour
         switch (stage)
         {
             case 0:
-                trackPad.GetComponent<MeshRenderer>().sharedMaterial = originalMaterial;
-                backButton.GetComponent<MeshRenderer>().sharedMaterial = pressClickMaterial;
+                backButton.GetComponent<MeshRenderer>().sharedMaterial = originalMaterial;
+                trackPad.GetComponent<MeshRenderer>().sharedMaterial = pressClickMaterial;
                 currentActiveMaterial.SetTexture("colorMap", activeColor);
                 currentActiveMaterial = pressClickMaterial;
                 break;
@@ -220,6 +223,12 @@ public class InrtoScript : MonoBehaviour
                 break;
             case 5:
                 trackPad.GetComponent<MeshRenderer>().sharedMaterial = pressClickMaterial;
+                currentActiveMaterial.SetTexture("colorMap", activeColor);
+                currentActiveMaterial = pressClickMaterial;
+                break;
+            case 6:
+                backButton.GetComponent<MeshRenderer>().sharedMaterial = pressClickMaterial;
+                trackPad.GetComponent<MeshRenderer>().sharedMaterial = originalMaterial;
                 currentActiveMaterial.SetTexture("colorMap", activeColor);
                 currentActiveMaterial = pressClickMaterial;
                 break;
