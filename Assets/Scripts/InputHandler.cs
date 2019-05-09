@@ -1,11 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class InputHandler : MonoBehaviour {
+public class InputHandler : MonoBehaviour, ICancelQuit
+{
     public RibbonGenerator ribbonGenerator;
     public ObjectCloner ribbonCloner;
     public AudioSynth audioSynth;
     public float fadeTime = 3f;
+    public GameObject quitMenu;
 
     private bool quitNow = false;
     private bool isStarting = true;
@@ -163,7 +165,8 @@ public class InputHandler : MonoBehaviour {
             ribbonCloner.transform.localScale = new Vector3(amt, amt, amt);
             yield return null;
         }
-        Application.Quit();
+        quitMenu.SetActive(true);
+        //Application.Quit();
     }
 
     private IEnumerator StartUp(float duration)
@@ -177,5 +180,11 @@ public class InputHandler : MonoBehaviour {
             ribbonCloner.transform.localScale = new Vector3(amt, amt, amt);
             yield return null;
         }
+    }
+
+    public void CancelledQuit()
+    {
+        quitMenu.SetActive(false);
+        isStarting = true;
     }
 }

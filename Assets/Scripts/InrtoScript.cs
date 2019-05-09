@@ -3,7 +3,7 @@ using UnityEngine.SceneManagement;
 using TMPro;
 using System.Collections;
 
-public class InrtoScript : MonoBehaviour
+public class InrtoScript : MonoBehaviour, ICancelQuit
 {
     public float delayTime = 2f;
     public TMP_Text titleText;
@@ -18,6 +18,8 @@ public class InrtoScript : MonoBehaviour
     public GameObject backButton;
     public Texture activeColor;
     public Texture selectedColor;
+    public GameObject quitMenu;
+    public GameObject textContainer;
     [SerializeField]
     public Color32[] colors;
 
@@ -38,6 +40,7 @@ public class InrtoScript : MonoBehaviour
     private Material originalMaterial;
     private Material currentActiveMaterial;
     private bool titleUp = false;
+    private bool quitMenuUp = false;
     private bool isOculusGo;
     private Coroutine nextAction;
     private bool readyToGo = false;
@@ -45,25 +48,36 @@ public class InrtoScript : MonoBehaviour
     private Vector2 touchPosition;
     private float outlineScale = .1f;
     private float outlineWiggle = 31f;
+
+    void Awake()
+    {
+        try
+        {
+            Oculus.Platform.Core.Initialize();
+            Oculus.Platform.Entitlements.IsUserEntitledToApplication().OnComplete(CheckComplete);
+        }
+        catch(UnityException e)
+        {
+            Debug.Log("Platform failed to initialize");
+        }
+    }
+
+    void CheckComplete(Oculus.Platform.Message callback)
+    {
+        if (callback.IsError)
+        {
+            Application.Quit();
+        }
+        else
+        {
+            Debug.Log("Passed");
+            readyToGo = true;
+        }
+    }
+
     // Start is called before the first frame update
     void Start()
     {
-        // Why do I have to put my Effing API key in plain text in the source code? This is terrible security.
-        Oculus.Platform.Core.Initialize("2829748573732373");
-        Oculus.Platform.Entitlements.IsUserEntitledToApplication().OnComplete(
-            (Oculus.Platform.Message msg) =>
-            {
-                if (msg.IsError)
-                {
-                    Application.Quit();
-                    Debug.Log("Tried to quit");
-                }
-                else
-                {
-                    readyToGo = true;
-                }
-            }
-        );
         // must be on the Oculus GO (for now)
         isOculusGo = (OVRPlugin.productName == "Oculus Go");
         if (isOculusGo)
@@ -87,7 +101,7 @@ public class InrtoScript : MonoBehaviour
         }
         Debug.Assert(titleText != null, "No TextMeshPro object specified or attached");
         Debug.Assert(trackPad != null && trigger != null, "Trackpad and Trigger object not specified");
-
+        Debug.Assert(quitMenu != null, "No QuitMenu object");
         titleText.rectTransform.gameObject.SetActive(false);
         warningText.fontSize = 3f;
         warningText.rectTransform.gameObject.SetActive(true);
@@ -109,69 +123,82 @@ public class InrtoScript : MonoBehaviour
     {
         OVRInput.Update();
 
-        if(titleUp)
+        if (!quitMenuUp)
         {
-            if (OVRInput.Get(OVRInput.Button.DpadRight) || Input.GetKeyUp(KeyCode.RightArrow))
+            if (titleUp)
             {
-                colorIndex = (colorIndex + 1) == colors.Length ? 0 : colorIndex + 1;
-                UpdateTitleColor();
-                actionFeedback = true;
-            } else if (OVRInput.Get(OVRInput.Button.DpadLeft) || Input.GetKeyUp(KeyCode.LeftArrow))
-            {
-                colorIndex = (colorIndex - 1) == -1 ? colors.Length - 1 : colorIndex - 1;
-                UpdateTitleColor();
-                actionFeedback = true;
-            } else if (OVRInput.Get(OVRInput.Button.DpadDown) || Input.GetKeyUp(KeyCode.DownArrow))
-            {
-                lineCount = (lineCount - 1) <= 0 ? 1 : lineCount - 1;
-                UpdateTitleCount(title, lineCount);
-                actionFeedback = true;
-            } else if(OVRInput.Get(OVRInput.Button.DpadUp) || Input.GetKeyUp(KeyCode.UpArrow))
-            {
-                lineCount = (lineCount + 1) >= 6 ? 5 : lineCount + 1;
-                UpdateTitleCount(title, lineCount);
-                actionFeedback = true;
-            } else if (OVRInput.GetUp(OVRInput.Button.PrimaryTouchpad) || Input.GetKeyUp(KeyCode.R))
-            {
-                if(readyToGo)
+                if (OVRInput.Get(OVRInput.Button.DpadRight) || Input.GetKeyUp(KeyCode.RightArrow))
                 {
-                    Debug.Log("Trying");
-                    AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(1);
+                    colorIndex = (colorIndex + 1) == colors.Length ? 0 : colorIndex + 1;
+                    UpdateTitleColor();
+                    actionFeedback = true;
                 }
-            } else if(OVRInput.Get(OVRInput.Touch.PrimaryTouchpad))
-            {
-                touchPosition = OVRInput.Get(OVRInput.Axis2D.PrimaryTouchpad);
-            } else if(OVRInput.GetUp(OVRInput.Touch.PrimaryTouchpad) || Input.GetKeyUp(KeyCode.S))
-            {
-                outlineScale = .03f + (touchPosition.y + 1f) * .05f;
-                outlineWiggle = (touchPosition.x + 1f) * 20f;
+                else if (OVRInput.Get(OVRInput.Button.DpadLeft) || Input.GetKeyUp(KeyCode.LeftArrow))
+                {
+                    colorIndex = (colorIndex - 1) == -1 ? colors.Length - 1 : colorIndex - 1;
+                    UpdateTitleColor();
+                    actionFeedback = true;
+                }
+                else if (OVRInput.Get(OVRInput.Button.DpadDown) || Input.GetKeyUp(KeyCode.DownArrow))
+                {
+                    lineCount = (lineCount - 1) <= 0 ? 1 : lineCount - 1;
+                    UpdateTitleCount(title, lineCount);
+                    actionFeedback = true;
+                }
+                else if (OVRInput.Get(OVRInput.Button.DpadUp) || Input.GetKeyUp(KeyCode.UpArrow))
+                {
+                    lineCount = (lineCount + 1) >= 6 ? 5 : lineCount + 1;
+                    UpdateTitleCount(title, lineCount);
+                    actionFeedback = true;
+                }
+                else if (OVRInput.GetUp(OVRInput.Button.PrimaryTouchpad) || Input.GetKeyUp(KeyCode.R))
+                {
+                    if (readyToGo)
+                    {
+                        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(1);
+                    }
+                }
+                else if (OVRInput.Get(OVRInput.Touch.PrimaryTouchpad))
+                {
+                    touchPosition = OVRInput.Get(OVRInput.Axis2D.PrimaryTouchpad);
+                }
+                else if (OVRInput.GetUp(OVRInput.Touch.PrimaryTouchpad) || Input.GetKeyUp(KeyCode.S))
+                {
+                    outlineScale = .03f + (touchPosition.y + 1f) * .05f;
+                    outlineWiggle = (touchPosition.x + 1f) * 20f;
+                }
             }
-        } else if (OVRInput.GetUp(OVRInput.Button.PrimaryTouchpad) || Input.GetKeyUp(KeyCode.R))
-        {
-            if(Time.time < delayTime)
+            else if (OVRInput.GetUp(OVRInput.Button.PrimaryTouchpad) || Input.GetKeyUp(KeyCode.R))
             {
-                delayTime = Time.time > 3f ? Time.time : 3f;
-                StopCoroutine(nextAction);
-                nextAction = StartCoroutine(ScriptNext(delayTime));
+                if (Time.time < delayTime)
+                {
+                    delayTime = Time.time > 3f ? Time.time : 3f;
+                    StopCoroutine(nextAction);
+                    nextAction = StartCoroutine(ScriptNext(delayTime));
+                }
+                ChangeWarningToTitle();
             }
-            ChangeWarningToTitle();
-        }
-        if (OVRInput.Get(OVRInput.Button.PrimaryIndexTrigger))
-        {
-            titleText.transform.rotation = (OVRInput.GetLocalControllerRotation(OVRInput.GetActiveController()));
-        }
-        if(OVRInput.GetUp(OVRInput.Button.Back) || Input.GetKeyUp(KeyCode.Backspace))
-        {
-            Application.Quit();
-        }
-        if(actionFeedback)
-        {
-            StartCoroutine(ActionFeedback());
-            actionFeedback = false;
-        }
-        if (titleUp)
-        {
-            titleText.outlineWidth = outlineScale * 2f + (Mathf.Sin(Time.time * outlineWiggle) + 1f) * outlineScale;
+            if (OVRInput.Get(OVRInput.Button.PrimaryIndexTrigger))
+            {
+                titleText.transform.rotation = (OVRInput.GetLocalControllerRotation(OVRInput.GetActiveController()));
+            }
+            if (OVRInput.GetUp(OVRInput.Button.Back) || Input.GetKeyUp(KeyCode.Backspace))
+            {
+                //Application.Quit();
+                instructionText.gameObject.SetActive(false);
+                textContainer.SetActive(false);
+                quitMenu.SetActive(true);
+                quitMenuUp = true;
+            }
+            if (actionFeedback)
+            {
+                StartCoroutine(ActionFeedback());
+                actionFeedback = false;
+            }
+            if (titleUp)
+            {
+                titleText.outlineWidth = outlineScale * 2f + (Mathf.Sin(Time.time * outlineWiggle) + 1f) * outlineScale;
+            }
         }
     }
 
@@ -276,5 +303,13 @@ public class InrtoScript : MonoBehaviour
         titleUp = true;
         titleText.rectTransform.gameObject.SetActive(true);
         UpdateTitleColor();
+    }
+
+    public void CancelledQuit()
+    {
+        quitMenuUp = false;
+        quitMenu.SetActive(false);
+        textContainer.SetActive(true);
+        instructionText.gameObject.SetActive(true);
     }
 }
