@@ -15,19 +15,41 @@ public class InputHandler : MonoBehaviour, ICancelQuit
     private Quaternion clonerStartOrientation;
     private Vector2 touchCoords;
 
+    // should be an enum? whtever
+    // 0 = PC
+    // 1 = Go / GearVR
+    // 2 = Quest
+    private short platform = 0;
+
     // Use this for initialization
     void Start () {
         if(audioSynth == null)
         {
             audioSynth = GetComponent<AudioSynth>();
         }
-        if(OVRManager.display != null)  //OVRManager.display exists or it doesn't, no flag to check other than if it's null.
+        if(OVRPlugin.GetSystemHeadsetType() == OVRPlugin.SystemHeadset.Oculus_Go)
         {
-            // This does not appear to do anything :(
-            OVRManager.display.RecenteredPose += Recenter;
-            // Oh yeah, 72Hz mode on Oculus Go, why not right?
-            OVRManager.display.displayFrequency = 72.0f;
+            platform = 1;
+            if(OVRManager.display != null)
+            {
+                Debug.Log("OVRManager.display is not null (Go)");
+                // This does not appear to do anything :(
+                OVRManager.display.RecenteredPose += Recenter;
+                // Oh yeah, 72Hz mode on Oculus Go, why not right?
+                OVRManager.display.displayFrequency = 72.0f;
+            }
         }
+        else if(OVRPlugin.GetSystemHeadsetType() == OVRPlugin.SystemHeadset.Oculus_Quest)
+        {
+            platform = 2;
+            if (OVRManager.display != null)
+                Debug.Log("OVRManager.display is not null (Quest)");
+        }
+        else
+        {
+            Debug.Log(" no display, but productName = " + OVRPlugin.productName);
+        }
+        Debug.Log("OVRPlugin.GetSystemHeadsetType() returns "+ OVRPlugin.GetSystemHeadsetType());
         OVRPlugin.vsyncCount = 0;
     }
      
@@ -66,9 +88,21 @@ public class InputHandler : MonoBehaviour, ICancelQuit
 
     private void HandleInput()
     {
-        //Currently handling Oculus GO and keyboard input types
-        Quaternion controllerLocalRotation = OVRInput.GetLocalControllerRotation(OVRInput.GetActiveController());
-        bool hasController = (controllerLocalRotation != Quaternion.identity);
+        Quaternion localControllerRotation = Quaternion.identity;
+        //Currently handling Oculus GO, Quest, and keyboard input types
+        switch (platform)
+        {
+            case 0: // PC
+                break;
+            case 1: // Go
+                localControllerRotation = OVRInput.GetLocalControllerRotation(OVRInput.GetActiveController());
+                break;
+            case 2: // Quest
+                localControllerRotation = OVRInput.GetLocalControllerRotation(OVRInput.Controller.RTrackedRemote);
+                break;
+        }
+        
+        bool hasController = (localControllerRotation != Quaternion.identity);
 
         // Controller discreet events, use else if because we don't want to double count clickUp as touchUp
         // Back is Quit
@@ -136,7 +170,7 @@ public class InputHandler : MonoBehaviour, ICancelQuit
         } else if (OVRInput.Get(OVRInput.Button.PrimaryIndexTrigger))
         {
             // slowly drift back to center when not grabbing
-            Quaternion rotateBy = Quaternion.Inverse(controllerStartOrientation) * OVRInput.GetLocalControllerRotation(OVRInput.GetActiveController());
+            Quaternion rotateBy = Quaternion.Inverse(controllerStartOrientation) * localControllerRotation;
             ribbonCloner.transform.rotation = rotateBy * clonerStartOrientation;
         }
         else
