@@ -508,7 +508,7 @@ MonoBehaviour:
   useIPDInPositionTracking: 1
   resetTrackerOnLoad: 0
   AllowRecenter: 1
-  _reorientHMDOnControllerRecenter: 0
+  _reorientHMDOnControllerRecenter: 1
 --- !u!1 &1259437090 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1324116726081602, guid: 84b7babd72cee85458079ffbc28392e1,

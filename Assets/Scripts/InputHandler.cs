@@ -11,8 +11,8 @@ public class InputHandler : MonoBehaviour, ICancelQuit
 
     private bool quitNow = false;
     private bool isStarting = true;
-    private Quaternion controllerStartOrientation;
-    private Quaternion clonerStartOrientation;
+    private Quaternion controllerStartRotation;
+    private Quaternion clonerStartRotation;
     private Vector2 touchCoords;
 
     // should be an enum? whtever
@@ -66,7 +66,7 @@ public class InputHandler : MonoBehaviour, ICancelQuit
 
     void FixedUpdate()
     {
-        OVRInput.FixedUpdate();
+        //OVRInput.FixedUpdate();
         ProcessAudio();
     }
 
@@ -82,59 +82,70 @@ public class InputHandler : MonoBehaviour, ICancelQuit
             StartCoroutine(StartQuitting(fadeTime));
             quitNow = false;
         }
-        OVRInput.Update();
+        //OVRInput.Update();
         HandleInput();
     }
 
     private void HandleInput()
     {
         Quaternion localControllerRotation = Quaternion.identity;
+        bool hasController = false;
         //Currently handling Oculus GO, Quest, and keyboard input types
         switch (platform)
         {
             case 0: // PC
                 break;
             case 1: // Go
-                localControllerRotation = OVRInput.GetLocalControllerRotation(OVRInput.GetActiveController());
+                localControllerRotation = OVRInput.GetLocalControllerRotation(OVRInput.GetActiveController());   
                 break;
             case 2: // Quest
-                localControllerRotation = OVRInput.GetLocalControllerRotation(OVRInput.Controller.RTrackedRemote);
+                    //// controller id strings:
+                    //// FUNCTION                       LEFT                RIGHT
+                    //// GetLocalControllerRotation     LTrackedRemote      RTrackedRemote
+                    //// GetLocalControllerPosition     LTrackedRemote      RTrackedRemote
+                    //// Axis2D Thumbstick              LThumbstick         RThumbstick
+                    //// Trigger buttons                PrimaryIndexTrigger SecondaryIndexTrigger
+                    //// Axis1D Trigger                 PrimaryIndexTrigger SecondaryIndexTrigger
+                    //// Neartouch Trigger              PrimaryIndexTrigger SecondaryIndexTrigger
+                    //// Grab Buttons                   PrimaryHandTrigger  SecondaryHandTrigger
+                    //// Axis1D Hand                    PrimaryHandTrigger  SecondaryHandTrigger
+                    //// Neartouch Hand                 PrimaryHandTrigger  SecondaryHandTrigger
+                    //// Top button                     Button.Three        Button.One
+                    //// bottom button                  Button.Four         Button.Two
+                localControllerRotation = OVRInput.GetLocalControllerRotation(OVRInput.Controller.LTrackedRemote);
                 break;
         }
-        
-        bool hasController = (localControllerRotation != Quaternion.identity);
-
         // Controller discreet events, use else if because we don't want to double count clickUp as touchUp
         // Back is Quit
-        if (OVRInput.GetUp(OVRInput.Button.Back) || Input.GetKeyUp(KeyCode.Backspace))
+        if (Input.GetKeyUp(KeyCode.Backspace) || OVRInput.GetUp(OVRInput.Button.Back) || OVRInput.GetUp(OVRInput.Button.Start))
         {
             //Debug.Log("GOT BACKBUTTON");
             //audioSynth.masterVolume = 0f;
             quitNow = true;
         }
         //Trackpad Gestures on the OVRInput.Get() 
-        else if (OVRInput.Get(OVRInput.Button.DpadDown) || Input.GetKeyUp(KeyCode.DownArrow))
+        else if (Input.GetKeyUp(KeyCode.DownArrow) || OVRInput.Get(OVRInput.Button.DpadDown) || OVRInput.GetUp(OVRInput.Button.PrimaryThumbstickDown))
         {
             //Debug.Log("GOT DOWN");
             ribbonCloner.SetNumber(ribbonCloner.GetNumber() - 1);
         }
         // Up Swipe Gesture (up arrow) increases arm count by 1
-        else if (OVRInput.Get(OVRInput.Button.DpadUp) || Input.GetKeyUp(KeyCode.UpArrow))
+        else if (Input.GetKeyUp(KeyCode.UpArrow) || OVRInput.Get(OVRInput.Button.DpadUp) || OVRInput.GetUp(OVRInput.Button.PrimaryThumbstickUp))
         {
             //Debug.Log("GOT UP");
             ribbonCloner.SetNumber(ribbonCloner.GetNumber() + 1);
         }
-        else if (OVRInput.Get(OVRInput.Button.DpadLeft) || Input.GetKeyUp(KeyCode.LeftArrow))
+        else if (Input.GetKeyUp(KeyCode.LeftArrow) || OVRInput.Get(OVRInput.Button.DpadLeft) || OVRInput.GetUp(OVRInput.Button.PrimaryThumbstickLeft))
         {
             //Debug.Log("GOT LEFT");
             ribbonCloner.ChangeColor(-1);
         }
-        else if (OVRInput.Get(OVRInput.Button.DpadRight) || Input.GetKeyUp(KeyCode.RightArrow))
+        else if (Input.GetKeyUp(KeyCode.RightArrow) || OVRInput.Get(OVRInput.Button.DpadRight) || OVRInput.GetUp(OVRInput.Button.PrimaryThumbstickRight))
         {
             //Debug.Log("GOT RIGHT");
             ribbonCloner.ChangeColor(1);
         }
-        else if (OVRInput.GetUp(OVRInput.Button.PrimaryTouchpad) || Input.GetKeyUp(KeyCode.R))
+        else if (Input.GetKeyUp(KeyCode.R) || OVRInput.GetUp(OVRInput.Button.PrimaryTouchpad) || OVRInput.GetUp(OVRInput.Button.PrimaryThumbstick))
         {
             //Debug.Log("GOT TRACKPAD CLICK");
             ribbonGenerator.SetScaledTime(-1f);
@@ -142,11 +153,15 @@ public class InputHandler : MonoBehaviour, ICancelQuit
             ribbonCloner.SetNumber(Random.Range(1, 15));
             ribbonCloner.ChangeColor(Random.Range(-2, 2)); 
         }
-        else if (OVRInput.Get(OVRInput.Touch.PrimaryTouchpad))
+        else if (OVRInput.Get(OVRInput.Touch.PrimaryTouchpad)) // For GO / Gear
         {
             touchCoords = OVRInput.Get(OVRInput.Axis2D.PrimaryTouchpad);
         }
-        else if(OVRInput.GetUp(OVRInput.Touch.PrimaryTouchpad) || Input.GetKeyUp(KeyCode.S))
+        else if(OVRInput.Get(OVRInput.Touch.PrimaryThumbstick)) // Quest
+        {
+            touchCoords = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick);
+        }
+        else if(Input.GetKeyUp(KeyCode.S) || OVRInput.GetUp(OVRInput.Touch.PrimaryTouchpad) || OVRInput.GetUp(OVRInput.Touch.PrimaryThumbstick))
         {
             float speedOverride = -1f;
             float widthOverride = -1f;
@@ -164,14 +179,14 @@ public class InputHandler : MonoBehaviour, ICancelQuit
         if(OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger))
         {
             //Debug.Log("GOT TRIGGER DOWN");
-            controllerStartOrientation = OVRInput.GetLocalControllerRotation(OVRInput.GetActiveController());
-            clonerStartOrientation = ribbonCloner.transform.rotation;
+            controllerStartRotation = localControllerRotation;
+            clonerStartRotation = ribbonCloner.transform.rotation;
             
         } else if (OVRInput.Get(OVRInput.Button.PrimaryIndexTrigger))
         {
             // slowly drift back to center when not grabbing
-            Quaternion rotateBy = Quaternion.Inverse(controllerStartOrientation) * localControllerRotation;
-            ribbonCloner.transform.rotation = rotateBy * clonerStartOrientation;
+            Quaternion rotateBy = Quaternion.Inverse(controllerStartRotation) * localControllerRotation;
+            ribbonCloner.transform.rotation = rotateBy * clonerStartRotation;
         }
         else
         {

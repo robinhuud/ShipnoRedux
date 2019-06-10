@@ -17,19 +17,38 @@ public class QuitNowBehavior : MonoBehaviour
     private ICancelQuit ControllerScript;
     private float controllerDirection;
     private bool currentAnswer = false;
+    private short controlType = 0; // 0- PC, 1-Go, 2-Quest
     void Awake()
     {
         ControllerScript = controller.GetComponent<ICancelQuit>();
         Debug.Assert(ControllerScript != null, "Controller Script does not implement ICancelQuit");
         Debug.Assert(YesAnswer != null, "No YesAnswer object specified");
         Debug.Assert(NoAnswer != null, "No NoAnswer object specified");
-        Debug.Assert(ControllerScript != null, "No MyIntroScript object specified");
+        if (OVRPlugin.GetSystemHeadsetType() == OVRPlugin.SystemHeadset.Oculus_Go)
+        {
+            controlType = 1;
+        }
+        else if (OVRPlugin.GetSystemHeadsetType() == OVRPlugin.SystemHeadset.Oculus_Quest)
+        {
+            controlType = 2;
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-        controllerDirection = OVRInput.GetLocalControllerRotation(OVRInput.GetActiveController()).eulerAngles.y;
+        switch(controlType)
+        {
+            case 0:
+                break;
+            case 1: // Go
+                controllerDirection = OVRInput.GetLocalControllerRotation(OVRInput.GetActiveController()).eulerAngles.y;
+                break;
+            case 2: // Quest
+                controllerDirection = OVRInput.GetLocalControllerRotation(OVRInput.Controller.RTrackedRemote).eulerAngles.y;
+                break;
+        }
+        
         if(controllerDirection < 180)
         {
             if(!currentAnswer)
@@ -39,7 +58,7 @@ public class QuitNowBehavior : MonoBehaviour
             YesAnswer.faceColor = new Color32((byte)255, (byte)255, (byte)255, (byte)255);
             NoAnswer.faceColor = new Color32((byte)128, (byte)128, (byte)128, (byte)255);
             currentAnswer = true;
-            if(OVRInput.GetUp(OVRInput.Button.PrimaryIndexTrigger))
+            if(Input.GetKeyUp(KeyCode.Y) || OVRInput.GetUp(OVRInput.Button.PrimaryIndexTrigger) || OVRInput.GetUp(OVRInput.Button.SecondaryIndexTrigger))
             {
                 Application.Quit();
             }
@@ -53,7 +72,7 @@ public class QuitNowBehavior : MonoBehaviour
             NoAnswer.faceColor = new Color32((byte)255, (byte)255, (byte)255, (byte)255);
             YesAnswer.faceColor = new Color32((byte)128, (byte)128, (byte)128, (byte)255);
             currentAnswer = false;
-            if (OVRInput.GetUp(OVRInput.Button.PrimaryIndexTrigger))
+            if (Input.GetKeyUp(KeyCode.N) || OVRInput.GetUp(OVRInput.Button.PrimaryIndexTrigger) || OVRInput.GetUp(OVRInput.Button.SecondaryIndexTrigger))
             {
                 ControllerScript.CancelledQuit();
             }
