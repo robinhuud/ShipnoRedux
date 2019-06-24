@@ -56,7 +56,7 @@ public class InrtoScript : MonoBehaviour, ICancelQuit
             Oculus.Platform.Core.Initialize();
             Oculus.Platform.Entitlements.IsUserEntitledToApplication().OnComplete(CheckComplete);
         }
-        catch(UnityException e)
+        catch(UnityException)
         {
             Debug.Log("Platform failed to initialize");
         }
@@ -70,7 +70,7 @@ public class InrtoScript : MonoBehaviour, ICancelQuit
         }
         else
         {
-            Debug.Log("Passed");
+            Debug.Log("IsUserEntitledToApplication() Passed");
             readyToGo = true;
         }
     }

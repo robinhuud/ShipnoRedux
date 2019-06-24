@@ -8,6 +8,7 @@ public class InputHandler : MonoBehaviour, ICancelQuit
     public AudioSynth audioSynth;
     public float fadeTime = 3f;
     public GameObject quitMenu;
+    public GameObject floorObject;
 
     private bool quitNow = false;
     private bool isStarting = true;
@@ -44,6 +45,18 @@ public class InputHandler : MonoBehaviour, ICancelQuit
             platform = 2;
             if (OVRManager.display != null)
                 Debug.Log("OVRManager.display is not null (Quest)");
+            if(OVRManager.boundary != null)
+            {
+                Vector3[] bounds = OVRManager.boundary.GetGeometry(OVRBoundary.BoundaryType.OuterBoundary);
+                if (bounds.Length > 0) // If the bounds are empty, I do not know how to determine the floor height, so we guess at -1.2m (shrug)
+                    floorObject.transform.SetPositionAndRotation(new Vector3(0, bounds[0].y, 0), Quaternion.identity);
+                else
+                    floorObject.transform.SetPositionAndRotation(new Vector3(0, -1.2f, 0), Quaternion.identity);
+            }
+            else
+            {
+                Debug.Log("bundary is null");
+            }
         }
         else
         {
