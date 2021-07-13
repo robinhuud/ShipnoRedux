@@ -434,6 +434,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 526f1bdeb224fd54998723eb04faf193, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  headset: 0
+  currentController: 0
 --- !u!4 &626956082
 Transform:
   m_ObjectHideFlags: 0
@@ -1025,7 +1027,7 @@ PrefabInstance:
     - target: {fileID: 4126154273492633710, guid: c0aa2f2da8129d14cb057c11b8fc273b,
         type: 3}
       propertyPath: m_Name
-      value: IntroController
+      value: IntroControllerGo
       objectReference: {fileID: 0}
     - target: {fileID: 4126154273492472910, guid: c0aa2f2da8129d14cb057c11b8fc273b,
         type: 3}

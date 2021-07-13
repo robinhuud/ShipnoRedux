@@ -165,6 +165,7 @@ MonoBehaviour:
   numClones: 3
   maxClones: 30
   axis: {x: 0, y: 0, z: 1}
+  symmetry: 0
 --- !u!4 &25400513
 Transform:
   m_ObjectHideFlags: 0
@@ -245,7 +246,7 @@ AudioSource:
   rolloffMode: 0
   BypassEffects: 0
   BypassListenerEffects: 0
-  BypassReverbZones: 1
+  BypassReverbZones: 0
   rolloffCustomCurve:
     serializedVersion: 2
     m_Curve:
@@ -346,7 +347,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!23 &764174967
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -859,21 +860,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: SingleRibbon
       objectReference: {fileID: 0}
-    - target: {fileID: 114455128382909976, guid: 84b7babd72cee85458079ffbc28392e1,
-        type: 3}
-      propertyPath: ribbonLength
-      value: 110
-      objectReference: {fileID: 0}
-    - target: {fileID: 114455128382909976, guid: 84b7babd72cee85458079ffbc28392e1,
-        type: 3}
-      propertyPath: timeScale
-      value: 0.85
-      objectReference: {fileID: 0}
-    - target: {fileID: 114455128382909976, guid: 84b7babd72cee85458079ffbc28392e1,
-        type: 3}
-      propertyPath: deltaScale
-      value: 10
-      objectReference: {fileID: 0}
     - target: {fileID: 4319696221230066, guid: 84b7babd72cee85458079ffbc28392e1, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -917,6 +903,21 @@ PrefabInstance:
     - target: {fileID: 4319696221230066, guid: 84b7babd72cee85458079ffbc28392e1, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114455128382909976, guid: 84b7babd72cee85458079ffbc28392e1,
+        type: 3}
+      propertyPath: ribbonLength
+      value: 110
+      objectReference: {fileID: 0}
+    - target: {fileID: 114455128382909976, guid: 84b7babd72cee85458079ffbc28392e1,
+        type: 3}
+      propertyPath: timeScale
+      value: 0.85
+      objectReference: {fileID: 0}
+    - target: {fileID: 114455128382909976, guid: 84b7babd72cee85458079ffbc28392e1,
+        type: 3}
+      propertyPath: deltaScale
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 23686695983364226, guid: 84b7babd72cee85458079ffbc28392e1,
         type: 3}

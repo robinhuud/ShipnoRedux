@@ -23,7 +23,7 @@ public class InrtoScript : MonoBehaviour, ICancelQuit
     [SerializeField]
     public Color32[] colors;
 
-    private string[] script =
+    private string[] scriptGo =
     {
         "Click - Skip Intro",
         "Swipe Left/Right - Color",
@@ -33,6 +33,16 @@ public class InrtoScript : MonoBehaviour, ICancelQuit
         "Click Trackpad - Start / Randomize",
         "Back Button - Exit"
     };
+    private string[] scriptQuest =
+    {
+        "Skip Intro",
+        "Change Color",
+        "Number",
+        "Orientation",
+        "Width/Intensity",
+        "Start / Randomize",
+        "Exit"
+    };
     private string title = "Whirledelic";
     private int stage = -1;
     private int colorIndex = 0;
@@ -41,26 +51,31 @@ public class InrtoScript : MonoBehaviour, ICancelQuit
     private Material currentActiveMaterial;
     private bool titleUp = false;
     private bool quitMenuUp = false;
-    private bool isOculusGo;
+    private bool onGo = true;
+    private OVRPlugin.SystemHeadset headset;
     private Coroutine nextAction;
-    private bool readyToGo = false;
     private bool actionFeedback;
     private Vector2 touchPosition;
     private float outlineScale = .1f;
     private float outlineWiggle = 31f;
+    private bool readyToGo = true;
+    private string nextScene = "Shipno";
 
-    void Awake()
-    {
-        try
-        {
-            Oculus.Platform.Core.Initialize();
-            Oculus.Platform.Entitlements.IsUserEntitledToApplication().OnComplete(CheckComplete);
-        }
-        catch(UnityException)
-        {
-            Debug.Log("Platform failed to initialize");
-        }
+    /*  This is the oculus entitlement check, uncomment it before submitting.
+   private readyToGo = false;
+   void Awake()
+   {
+       try
+       {
+           Oculus.Platform.Core.Initialize();
+           Oculus.Platform.Entitlements.IsUserEntitledToApplication().OnComplete(CheckComplete);
+       }
+       catch(UnityException)
+       {
+           Debug.Log("Platform failed to initialize");
+       }
     }
+
 
     void CheckComplete(Oculus.Platform.Message callback)
     {
@@ -70,26 +85,43 @@ public class InrtoScript : MonoBehaviour, ICancelQuit
         }
         else
         {
-            Debug.Log("IsUserEntitledToApplication() Passed");
+            //Debug.Log("IsUserEntitledToApplication() Passed");
             readyToGo = true;
         }
     }
+ */
 
     // Start is called before the first frame update
     void Start()
     {
-        // must be on the Oculus GO (for now)
-        isOculusGo = (OVRPlugin.productName == "Oculus Go");
-        if (isOculusGo)
+        // Figure out which headset we are running on.
+        headset = OVRPlugin.GetSystemHeadsetType();
+        if (headset == OVRPlugin.SystemHeadset.Oculus_Go) // The Original Go
         {
-            
+            onGo = true;
+            nextScene = "Shipno";
+        }
+        else if(headset == OVRPlugin.SystemHeadset.Rift_S) // the Rift-S on the PC
+        {
+            onGo = false;
+            nextScene = "ShipnoQuest";
+        }
+        else if(headset == OVRPlugin.SystemHeadset.Oculus_Quest) // The Quest 1
+        {
+            onGo = false;
+            nextScene = "ShipnoQuest";
+        }
+        else if(headset == OVRPlugin.SystemHeadset.Oculus_Quest+1) // The Quest 2?
+        {
+            onGo = false;
+            nextScene = "ShipnoQuest";
         }
         else
         {
             //Application.Quit();
         }
 
-        if (OVRManager.display != null)  //OVRManager.display exists or it doesn't, no flag to check other than if it's null.
+        if (OVRManager.display != null && onGo)  //OVRManager.display exists or it doesn't, no flag to check other than if it's null.
         {
             // Oh yeah, 72Hz mode on Oculus Go, why not right?
             OVRManager.display.displayFrequency = 72.0f;
@@ -127,35 +159,35 @@ public class InrtoScript : MonoBehaviour, ICancelQuit
         {
             if (titleUp)
             {
-                if (OVRInput.Get(OVRInput.Button.DpadRight) || Input.GetKeyUp(KeyCode.RightArrow))
+                if (OVRInput.Get(OVRInput.Button.DpadRight) || Input.GetKeyUp(KeyCode.RightArrow) || OVRInput.GetUp(OVRInput.Button.PrimaryThumbstickRight))
                 {
                     colorIndex = (colorIndex + 1) == colors.Length ? 0 : colorIndex + 1;
                     UpdateTitleColor();
                     actionFeedback = true;
                 }
-                else if (OVRInput.Get(OVRInput.Button.DpadLeft) || Input.GetKeyUp(KeyCode.LeftArrow))
+                else if (OVRInput.Get(OVRInput.Button.DpadLeft) || Input.GetKeyUp(KeyCode.LeftArrow) || OVRInput.GetUp(OVRInput.Button.PrimaryThumbstickLeft))
                 {
                     colorIndex = (colorIndex - 1) == -1 ? colors.Length - 1 : colorIndex - 1;
                     UpdateTitleColor();
                     actionFeedback = true;
                 }
-                else if (OVRInput.Get(OVRInput.Button.DpadDown) || Input.GetKeyUp(KeyCode.DownArrow))
+                else if (OVRInput.Get(OVRInput.Button.DpadDown) || Input.GetKeyUp(KeyCode.DownArrow) || OVRInput.GetUp(OVRInput.Button.PrimaryThumbstickDown))
                 {
                     lineCount = (lineCount - 1) <= 0 ? 1 : lineCount - 1;
                     UpdateTitleCount(title, lineCount);
                     actionFeedback = true;
                 }
-                else if (OVRInput.Get(OVRInput.Button.DpadUp) || Input.GetKeyUp(KeyCode.UpArrow))
+                else if (OVRInput.Get(OVRInput.Button.DpadUp) || Input.GetKeyUp(KeyCode.UpArrow) || OVRInput.GetUp(OVRInput.Button.PrimaryThumbstickUp))
                 {
                     lineCount = (lineCount + 1) >= 6 ? 5 : lineCount + 1;
                     UpdateTitleCount(title, lineCount);
                     actionFeedback = true;
                 }
-                else if (OVRInput.GetUp(OVRInput.Button.PrimaryTouchpad) || Input.GetKeyUp(KeyCode.R))
+                else if (OVRInput.GetUp(OVRInput.Button.PrimaryTouchpad) || Input.GetKeyUp(KeyCode.R) || OVRInput.GetUp(OVRInput.Button.PrimaryThumbstick))
                 {
                     if (readyToGo)
                     {
-                        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(1);
+                        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(nextScene);
                     }
                 }
                 else if (OVRInput.Get(OVRInput.Touch.PrimaryTouchpad))
@@ -182,7 +214,7 @@ public class InrtoScript : MonoBehaviour, ICancelQuit
             {
                 titleText.transform.rotation = (OVRInput.GetLocalControllerRotation(OVRInput.GetActiveController()));
             }
-            if (OVRInput.GetUp(OVRInput.Button.Back) || Input.GetKeyUp(KeyCode.Backspace))
+            if (OVRInput.GetUp(OVRInput.Button.Back) || Input.GetKeyUp(KeyCode.Backspace) || OVRInput.GetUp(OVRInput.Button.Start))
             {
                 //Application.Quit();
                 instructionText.gameObject.SetActive(false);
@@ -204,7 +236,7 @@ public class InrtoScript : MonoBehaviour, ICancelQuit
 
     IEnumerator ScriptNext(float delayTime)
     {
-        if (stage >= script.Length - 1)
+        if (stage >= scriptGo.Length - 1)
         {
             stage = 0;
         }
@@ -212,7 +244,7 @@ public class InrtoScript : MonoBehaviour, ICancelQuit
         {
             stage++;
         }
-        instructionText.text = script[stage];
+        instructionText.text = scriptGo[stage];
         switch (stage)
         {
             case 0:

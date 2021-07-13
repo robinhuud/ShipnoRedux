@@ -133,7 +133,7 @@ public class RibbonGenerator : MonoBehaviour {
         }
 
         // Secret sauce
-        scale += new Vector2(d * .0537f * Mathf.Cos((t * .6f)), d * .0537f * Mathf.Sin((t * .35f)));
+        scale += new Vector2(d * .0537f * Mathf.Cos((t * .6f)), d * .0427f * Mathf.Sin((t * .35f)));
         frequency += new Vector2(d * 0.0037f * Mathf.Cos((t * .023f)), d * 0.0039f * Mathf.Sin((t * .032f)));
         twirl += new Vector2(d * .0063f * Mathf.Cos((t * .103f)), d * .0071f * Mathf.Sin((t * .172f)));
         if (autoUpdate)

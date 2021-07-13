@@ -13,6 +13,8 @@ public class QuitNowBehavior : MonoBehaviour
     public TMP_Text YesAnswer;
     public TMP_Text NoAnswer;
     public GameObject controller;
+    public Color32 activeColor = new Color32((byte)255, (byte)255, (byte)255, (byte)255);
+    public Color32 inactiveColor = new Color32((byte)128, (byte)128, (byte)128, (byte)255);
 
     private ICancelQuit ControllerScript;
     private float controllerDirection;
@@ -21,9 +23,9 @@ public class QuitNowBehavior : MonoBehaviour
     void Awake()
     {
         ControllerScript = controller.GetComponent<ICancelQuit>();
-        Debug.Assert(ControllerScript != null, "Controller Script does not implement ICancelQuit");
-        Debug.Assert(YesAnswer != null, "No YesAnswer object specified");
-        Debug.Assert(NoAnswer != null, "No NoAnswer object specified");
+        Debug.Assert(!(ControllerScript is null), "Controller Script does not implement ICancelQuit");
+        Debug.Assert(!(YesAnswer is null), "No YesAnswer object specified");
+        Debug.Assert(!(NoAnswer is null), "No NoAnswer object specified");
         if (OVRPlugin.GetSystemHeadsetType() == OVRPlugin.SystemHeadset.Oculus_Go)
         {
             controlType = 1;
@@ -39,7 +41,8 @@ public class QuitNowBehavior : MonoBehaviour
     {
         switch(controlType)
         {
-            case 0:
+            case 0: // PC
+                controllerDirection = OVRInput.GetLocalControllerRotation(OVRInput.Controller.RTrackedRemote).eulerAngles.y;
                 break;
             case 1: // Go
                 controllerDirection = OVRInput.GetLocalControllerRotation(OVRInput.GetActiveController()).eulerAngles.y;
@@ -55,8 +58,8 @@ public class QuitNowBehavior : MonoBehaviour
             {
                 popMaker.Play();
             }
-            YesAnswer.faceColor = new Color32((byte)255, (byte)255, (byte)255, (byte)255);
-            NoAnswer.faceColor = new Color32((byte)128, (byte)128, (byte)128, (byte)255);
+            YesAnswer.faceColor = activeColor;
+            NoAnswer.faceColor = inactiveColor;
             currentAnswer = true;
             if(Input.GetKeyUp(KeyCode.Y) || OVRInput.GetUp(OVRInput.Button.PrimaryIndexTrigger) || OVRInput.GetUp(OVRInput.Button.SecondaryIndexTrigger))
             {
@@ -69,8 +72,8 @@ public class QuitNowBehavior : MonoBehaviour
             {
                 popMaker.Play();
             }
-            NoAnswer.faceColor = new Color32((byte)255, (byte)255, (byte)255, (byte)255);
-            YesAnswer.faceColor = new Color32((byte)128, (byte)128, (byte)128, (byte)255);
+            NoAnswer.faceColor = activeColor;
+            YesAnswer.faceColor = inactiveColor;
             currentAnswer = false;
             if (Input.GetKeyUp(KeyCode.N) || OVRInput.GetUp(OVRInput.Button.PrimaryIndexTrigger) || OVRInput.GetUp(OVRInput.Button.SecondaryIndexTrigger))
             {
