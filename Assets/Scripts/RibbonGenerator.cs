@@ -106,10 +106,10 @@ public class RibbonGenerator : MonoBehaviour {
         targetT = 50f * (1f / Time.deltaTime) * target;
     }
 
-    // Update is called once per frame
-    void Update()
+    // FixedUpdate is called once per physics frame
+    void FixedUpdate()
     {
-        float d = Time.deltaTime * timeScale;
+        float d = Time.fixedDeltaTime * timeScale;
         if(targeting)
         {
             float delta = t - targetT;
@@ -125,7 +125,6 @@ public class RibbonGenerator : MonoBehaviour {
             {
                 targeting = false;
             }
-            Debug.Log(targetT + "  " + t);
         }
         else
         {

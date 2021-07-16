@@ -8,7 +8,6 @@ public enum SymmetryType
 }
 
 public class ObjectCloner : MonoBehaviour {
-    //This Serializable private field pattern is good C# form, but causes compiler warnings in Unity, if you want to get rid of the warning, make them public
     [SerializeField] 
     private GameObject cloneThis;
     [SerializeField]
@@ -24,11 +23,18 @@ public class ObjectCloner : MonoBehaviour {
     [SerializeField]
     private SymmetryType symmetry = SymmetryType.Rotation;
 
-    private int textureIndex = 0;
+    // Index into the colorRamp lookup table
+    private int colorRampIndex = 0;
+    // index into the greyscaleTextures lookup table
+    private int greyscaleTextureIndex = 0;
+    //Used by the object pooler to manage the ribbons
     private static List<GameObject> ribbonPool;
+    // Should we do a re-layout next physics frame?
     private bool dirty = false;
+    // All the clones share a material so we only have to manipulate it once
     private Material sharedMat;
-    private Vector3 myScale;
+    // Store the cycle speed so we can tweak it without asking the shader
+    private float cycleSpeed;
 
     // Use this for initialization
     void Start () {
@@ -43,15 +49,15 @@ public class ObjectCloner : MonoBehaviour {
             clone.transform.SetParent(this.transform);
         }
         sharedMat = this.transform.GetChild(0).GetComponent<MeshRenderer>().sharedMaterial;
+        cycleSpeed = Random.Range(-5f, 5f);
         ChangeColor(0);
         dirty = true;
-        myScale = transform.localScale;
 	}
 	
 	// Update is called once per frame
     // thanks to execution order in Edit->Project Settings->Execution Order we know that this script will run after
     // the RibbonGenerator Update method
-	void Update () {
+	void FixedUpdate () {
         if(dirty)
         {
             ReLayout();
@@ -76,7 +82,7 @@ public class ObjectCloner : MonoBehaviour {
             if(newSymmetryType == SymmetryType.Mirror)
             {
                 // When we change to mirror symmetry we force the number of arms to be a power of 2;
-                SetNumber(numClones);
+                SetNumber(NearestPowerOf2(numClones));
             }
             symmetry = newSymmetryType;
             dirty = true;
@@ -90,30 +96,43 @@ public class ObjectCloner : MonoBehaviour {
         dirty = true;
     }
 
+    public void ChangeCycleSpeed(float delta)
+    {
+        cycleSpeed += delta;
+        sharedMat.SetFloat("_CycleSpeed", cycleSpeed);
+    }
+
     public void ChangeColor(int delta)
     {
-        textureIndex += delta;
-        if(textureIndex < 0)
-        {
-            textureIndex += colorRamps.Length;
-        }
+        colorRampIndex += delta;
+        if(colorRampIndex < 0)
+            colorRampIndex += colorRamps.Length;
         else
-        {
-            textureIndex %= colorRamps.Length;
-        }
+            colorRampIndex %= colorRamps.Length;
         
-        this.transform.GetChild(0).GetComponent<MeshRenderer>().sharedMaterial.SetTexture("_MainTex", greyscaleTextures[(int)Random.Range(0,greyscaleTextures.Length)]);
-        this.transform.GetChild(0).GetComponent<MeshRenderer>().sharedMaterial.SetTexture("colorMap", colorRamps[textureIndex]);
-        sharedMat.SetFloat("_CycleSpeed", Random.Range(-5f, 5f));
+        sharedMat.SetTexture("colorMap", colorRamps[colorRampIndex]);
+    }
+    
+    public void ChangeTexture(int delta)
+    {
+        greyscaleTextureIndex += delta;
+        if (greyscaleTextureIndex < 0)
+            greyscaleTextureIndex += greyscaleTextures.Length;
+        else
+            greyscaleTextureIndex %= greyscaleTextures.Length;
+        sharedMat.SetTexture("_MainTex", greyscaleTextures[greyscaleTextureIndex]);
     }
 
     public void SetNumber(int number)
     {
+        // restrict number to useful range
         number = Mathf.Clamp(number, 0, maxClones);
         if (symmetry == SymmetryType.Mirror)
         {
             number = NearestPowerOf2(number);
         }
+
+        // If we don't have enough, we get them from the pool
         if (number > numClones)
         {
             for (int i = 0; i < number - numClones; i++)
@@ -123,7 +142,8 @@ public class ObjectCloner : MonoBehaviour {
             }
             numClones = number;
             dirty = true;
-        } 
+        }
+        // if we have too many we free them
         else if (number < numClones)
         {
             if (number >= 1)
@@ -136,6 +156,7 @@ public class ObjectCloner : MonoBehaviour {
                 dirty = true;
             }
         }
+        // if it's the same number, no need to do anything
     }
 
     private int NearestPowerOf2(int number)
@@ -377,6 +398,7 @@ public class ObjectCloner : MonoBehaviour {
         }
     }
 
+    // This is a little object pooler for the ribbon objects.
     private static GameObject CreateRibbon(GameObject cloneThis)
     {
         GameObject target = null;

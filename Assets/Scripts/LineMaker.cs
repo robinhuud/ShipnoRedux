@@ -7,6 +7,8 @@ public class LineMaker : MonoBehaviour
     public int numLines = 10;
     public int numPoints = 30;
     public Material mat;
+    public float noiseScale = .1f;
+    public float ringRadius = .5f;
 
     private NoiseLooper[] noiseLoopers;
     private float noiseOffset = 0f;
@@ -24,11 +26,11 @@ public class LineMaker : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         for(int i = 0; i < noiseLoopers.Length; i++)
         {
-            noiseLoopers[i].SetOffset(.01f, .01f);
+            noiseLoopers[i].SetOffset(.001f, .001f);
         }
     }
 
@@ -39,33 +41,40 @@ public class LineMaker : MonoBehaviour
 
     void DrawLines()
     {
-        float alpha = 0;
-        GL.PushMatrix();
+        int l = noiseLoopers.Length;
+        float zDist;
+        float distScale;
+        float x;
+        float y;
+        float z;
+        float noisePos;
+        float noiseVal;
+        //GL.PushMatrix();
         mat.SetPass(0);
-        for (int i = 0; i < noiseLoopers.Length; i++)
+        for (int i = 0; i < l; i++)
         {
-            float x;
-            float y;
-            float z = transform.localPosition.z + transform.localScale.z * (((float)i / (float)noiseLoopers.Length) - .5f);
-            float noisePos = 0;
-            alpha = i / noiseLoopers.Length;
+            zDist = (float)i / l;
+            distScale = 1 - zDist * .8f;
+            z = transform.localPosition.z + transform.localScale.z * (zDist - .5f);
             GL.Begin(GL.LINE_STRIP);
-            GL.Color(new Color(1, 1, 1, alpha));
+            //GL.Color(new Color(1, 1, 1, zDist));
             for (int j = 0; j < numPoints; j++)
             {
-                noisePos = (float)j / (float)numPoints;
-                x = transform.localPosition.x + transform.localScale.x * (.5f * noiseLoopers[i].GetLoopedNoise(noisePos + noiseOffset) + .5f) * Mathf.Cos(noisePos * Mathf.PI * 2f);
-                y = transform.localPosition.y + transform.localScale.y * (.5f * noiseLoopers[i].GetLoopedNoise(noisePos + noiseOffset) + .5f) * Mathf.Sin(noisePos * Mathf.PI * 2f);
-                GL.TexCoord2(noisePos, ((float)i / (float)noiseLoopers.Length));
+                noisePos = (float)j / numPoints;
+                noiseVal = noiseLoopers[i].GetLoopedNoise(noisePos + noiseOffset);
+                x = transform.localPosition.x + distScale * transform.localScale.x * (noiseScale * noiseVal + ringRadius) * Mathf.Cos(noisePos * Mathf.PI * 2f);
+                y = transform.localPosition.y + distScale * transform.localScale.y * (noiseScale * noiseVal + ringRadius) * Mathf.Sin(noisePos * Mathf.PI * 2f);
+                GL.TexCoord2(noisePos <= .5f? noisePos * 2f:2f - noisePos * 2f, zDist);
                 GL.Vertex3(x, y, z);
             }
             // close the loop
-            x = transform.localPosition.x + transform.localScale.x * (.5f * noiseLoopers[i].GetLoopedNoise(noiseOffset) + .5f);
+            x = transform.localPosition.x + distScale * transform.localScale.x * (noiseScale * noiseLoopers[i].GetLoopedNoise(noiseOffset) + ringRadius);
+            // we know y is zero here, so no need for the math.
             y = transform.localPosition.y;
-            GL.TexCoord2(1, ((float)i / (float)noiseLoopers.Length));
+            GL.TexCoord2(1, zDist);
             GL.Vertex3(x, y, z);
             GL.End();
         }
-        GL.PopMatrix();
+        //GL.PopMatrix();
     }
 }

@@ -10,6 +10,7 @@ public class InputHandlerQuest : MonoBehaviour, ICancelQuit
     public ObjectCloner ribbonCloner;
     public AudioSynth audioSynth;
     public float fadeTime = 3f;
+    public float controllerMovementThreshold = .2f;
     public GameObject quitMenu;
     public GameObject floorObject;
 
@@ -18,16 +19,15 @@ public class InputHandlerQuest : MonoBehaviour, ICancelQuit
     private bool quitNow = false;
     private bool isStarting = true;
     private Quaternion controllerStartRotation;
+    private Vector3 controllerStartPosition;
     private Quaternion clonerStartRotation;
-    private Vector2 touchCoords;
-
-    private SymmetryType symmetry = SymmetryType.Rotation;
 
     // should be an enum? whtever
     // 0 = Unknown (Generic)
     // 2 = Quest
     // 3 = Rift-S
     private short platform = 0;
+
 
     // Start is called before the first frame update
     void Start()
@@ -60,6 +60,7 @@ public class InputHandlerQuest : MonoBehaviour, ICancelQuit
             if (OVRManager.boundary != null)
             {
                 Vector3[] bounds = OVRManager.boundary.GetGeometry(OVRBoundary.BoundaryType.OuterBoundary);
+                Debug.Log("boundary found, floor level is " + bounds[0].y);
                 if (bounds.Length > 0) // If the bounds are empty, I do not know how to determine the floor height so we use the default value from the inspector
                     floorObject.transform.SetPositionAndRotation(new Vector3(0, bounds[0].y, 0), Quaternion.identity);
                 else
@@ -67,7 +68,7 @@ public class InputHandlerQuest : MonoBehaviour, ICancelQuit
             }
             else
             {
-                Debug.Log("bundary is null");
+                Debug.Log("boundary is null");
             }
         }
         else if (OVRPlugin.GetSystemHeadsetType() == OVRPlugin.SystemHeadset.Rift_S)
@@ -78,6 +79,7 @@ public class InputHandlerQuest : MonoBehaviour, ICancelQuit
             if (OVRManager.boundary != null)
             {
                 Vector3[] bounds = OVRManager.boundary.GetGeometry(OVRBoundary.BoundaryType.OuterBoundary);
+                Debug.Log("boundary found, floor level is " + bounds[0].y);
                 if (bounds.Length > 0)
                     floorObject.transform.SetPositionAndRotation(new Vector3(0, bounds[0].y, 0), Quaternion.identity);
                 else
@@ -141,11 +143,13 @@ public class InputHandlerQuest : MonoBehaviour, ICancelQuit
     {
         Quaternion leftControllerRotation = Quaternion.identity;
         Quaternion rightControllerRotation = Quaternion.identity;
-        bool hasController = false;
+        Vector3 leftControllerPosition = Vector3.zero;
+        Vector3 rightControllerPosition = Vector3.zero;
+        Vector3 delta;
         // This is ONLY for PC and Quest, separate script for Go
         switch (platform)
         {
-            case 0: // PC
+            case 0: // Generic
                 break;
             case 2: // Quest
                     //// controller id strings:
@@ -163,10 +167,14 @@ public class InputHandlerQuest : MonoBehaviour, ICancelQuit
                     //// bottom button                  Button.Four         Button.Two
                 leftControllerRotation = OVRInput.GetLocalControllerRotation(OVRInput.Controller.LTrackedRemote);
                 rightControllerRotation = OVRInput.GetLocalControllerRotation(OVRInput.Controller.RTrackedRemote);
+                leftControllerPosition = OVRInput.GetLocalControllerPosition(OVRInput.Controller.LTrackedRemote);
+                rightControllerPosition = OVRInput.GetLocalControllerPosition(OVRInput.Controller.RTrackedRemote);
                 break;
             case 3: // Rift-S
                 leftControllerRotation = OVRInput.GetLocalControllerRotation(OVRInput.Controller.LTrackedRemote);
                 rightControllerRotation = OVRInput.GetLocalControllerRotation(OVRInput.Controller.RTrackedRemote);
+                leftControllerPosition = OVRInput.GetLocalControllerPosition(OVRInput.Controller.LTrackedRemote);
+                rightControllerPosition = OVRInput.GetLocalControllerPosition(OVRInput.Controller.RTrackedRemote);
                 break;
         }
 
@@ -174,19 +182,18 @@ public class InputHandlerQuest : MonoBehaviour, ICancelQuit
         // used to switch symmetry
         if(Input.GetKeyUp(KeyCode.X) || OVRInput.GetUp(OVRInput.Button.Four))
         {
-            if(symmetry == SymmetryType.Mirror)
+            if (ribbonCloner.GetSymmetry() == SymmetryType.Mirror)
             {
-                symmetry = SymmetryType.Rotation;
+                ribbonCloner.SetSymmetry(SymmetryType.Rotation);
             }
             else
             {
-                symmetry = SymmetryType.Mirror;
+                ribbonCloner.SetSymmetry(SymmetryType.Mirror);
             }
-            ribbonCloner.SetSymmetry(symmetry);
         }
         // Controller discreet events, use else if because we don't want to double count clickUp as touchUp
         // Back is Quit
-        if (Input.GetKeyUp(KeyCode.Backspace) || OVRInput.GetUp(OVRInput.Button.Back) || OVRInput.GetUp(OVRInput.Button.Start))
+        else if (Input.GetKeyUp(KeyCode.Backspace) || OVRInput.GetUp(OVRInput.Button.Back) || OVRInput.GetUp(OVRInput.Button.Start))
         {
             //Debug.Log("GOT BACKBUTTON");
             //audioSynth.masterVolume = 0f;
@@ -196,7 +203,7 @@ public class InputHandlerQuest : MonoBehaviour, ICancelQuit
         else if (Input.GetKeyUp(KeyCode.DownArrow) || OVRInput.Get(OVRInput.Button.DpadDown) || OVRInput.GetUp(OVRInput.Button.PrimaryThumbstickDown))
         {
             //Debug.Log("GOT DOWN");
-            if(symmetry == SymmetryType.Rotation)
+            if(ribbonCloner.GetSymmetry() == SymmetryType.Rotation)
             {
                 ribbonCloner.SetNumber(ribbonCloner.GetNumber() - 1);
             }
@@ -209,7 +216,7 @@ public class InputHandlerQuest : MonoBehaviour, ICancelQuit
         else if (Input.GetKeyUp(KeyCode.UpArrow) || OVRInput.Get(OVRInput.Button.DpadUp) || OVRInput.GetUp(OVRInput.Button.PrimaryThumbstickUp))
         {
             //Debug.Log("GOT UP");
-            if(symmetry == SymmetryType.Rotation)
+            if(ribbonCloner.GetSymmetry() == SymmetryType.Rotation)
             {
                 ribbonCloner.SetNumber(ribbonCloner.GetNumber() + 1);
             }
@@ -221,12 +228,12 @@ public class InputHandlerQuest : MonoBehaviour, ICancelQuit
         else if (Input.GetKeyUp(KeyCode.LeftArrow) || OVRInput.Get(OVRInput.Button.DpadLeft) || OVRInput.GetUp(OVRInput.Button.PrimaryThumbstickLeft))
         {
             //Debug.Log("GOT LEFT");
-            ribbonCloner.ChangeColor(-1);
+            //ribbonCloner.ChangeColor(-1);
         }
         else if (Input.GetKeyUp(KeyCode.RightArrow) || OVRInput.Get(OVRInput.Button.DpadRight) || OVRInput.GetUp(OVRInput.Button.PrimaryThumbstickRight))
         {
             //Debug.Log("GOT RIGHT");
-            ribbonCloner.ChangeColor(1);
+            //ribbonCloner.ChangeColor(1);
         }
         else if (Input.GetKeyUp(KeyCode.R) || OVRInput.GetUp(OVRInput.Button.PrimaryTouchpad) || OVRInput.GetUp(OVRInput.Button.PrimaryThumbstick))
         {
@@ -235,11 +242,11 @@ public class InputHandlerQuest : MonoBehaviour, ICancelQuit
         }
         else if (OVRInput.Get(OVRInput.Touch.PrimaryTouchpad)) // For GO / Gear
         {
-            touchCoords = OVRInput.Get(OVRInput.Axis2D.PrimaryTouchpad);
+            //touchCoords = OVRInput.Get(OVRInput.Axis2D.PrimaryTouchpad);
         }
         else if (OVRInput.Get(OVRInput.Touch.PrimaryThumbstick)) // Quest
         {
-            touchCoords = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick);
+            //touchCoords = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick);
         }
         else if (Input.GetKeyUp(KeyCode.S) || OVRInput.GetUp(OVRInput.Touch.PrimaryTouchpad) || OVRInput.GetUp(OVRInput.Touch.PrimaryThumbstick))
         {
@@ -258,22 +265,65 @@ public class InputHandlerQuest : MonoBehaviour, ICancelQuit
             ribbonGenerator.SetWidthOverride(widthOverride);
             */
         }
+        // GRAB-TO-ROTATE behavior
         if (OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger))
         {
-            //Debug.Log("GOT TRIGGER DOWN");
+            //When the user pulls the trigger, we remember the orientation of the controller so that we can move relative to the starting orientation
             controllerStartRotation = leftControllerRotation;
             clonerStartRotation = ribbonCloner.transform.rotation;
 
         }
         else if (OVRInput.Get(OVRInput.Button.PrimaryIndexTrigger))
         {
-            // slowly drift back to center when not grabbing
+            //As the trigger is held down we track the relative rotation of the controller and transfer it to the object.
             Quaternion rotateBy = Quaternion.Inverse(controllerStartRotation) * leftControllerRotation;
             ribbonCloner.transform.rotation = rotateBy * clonerStartRotation;
         }
         else
         {
+            // slowly drift back to center when not grabbing
             ribbonCloner.transform.rotation = Quaternion.RotateTowards(ribbonCloner.transform.rotation, Quaternion.identity, .05f);
+        }
+
+        // New change color gesture is right grab trigger then up/down in space for colormap, left/right for texture, fwd/back for speed
+        if(OVRInput.GetDown(OVRInput.Button.SecondaryHandTrigger))
+        {
+            // Record the start position of the right controller so we know how far the user moved.
+            controllerStartPosition = rightControllerPosition;
+        }
+        else if (OVRInput.Get(OVRInput.Button.SecondaryHandTrigger))
+        {
+            delta = rightControllerPosition - controllerStartPosition;
+            if (delta.x > controllerMovementThreshold)
+            {
+                ribbonCloner.ChangeTexture(1);
+                controllerStartPosition = new Vector3(rightControllerPosition.x, controllerStartPosition.y, controllerStartPosition.z);
+            }
+            if (delta.x < -controllerMovementThreshold)
+            {
+                ribbonCloner.ChangeTexture(-1);
+                controllerStartPosition = new Vector3(rightControllerPosition.x, controllerStartPosition.y, controllerStartPosition.z);
+            }
+            if (delta.y > controllerMovementThreshold)
+            {
+                ribbonCloner.ChangeColor(1);
+                controllerStartPosition = new Vector3(controllerStartPosition.x, rightControllerPosition.y, controllerStartPosition.z);
+            }
+            if (delta.y < -controllerMovementThreshold)
+            {
+                ribbonCloner.ChangeColor(-1);
+                controllerStartPosition = new Vector3(controllerStartPosition.x, rightControllerPosition.y, controllerStartPosition.z);
+            }
+            if (delta.z > controllerMovementThreshold)
+            {
+                ribbonCloner.ChangeCycleSpeed(delta.z);
+                controllerStartPosition = new Vector3(controllerStartPosition.x, controllerStartPosition.y, rightControllerPosition.z);
+            }
+            if (delta.z < -controllerMovementThreshold)
+            {
+                ribbonCloner.ChangeCycleSpeed(delta.z);
+                controllerStartPosition = new Vector3(controllerStartPosition.x, controllerStartPosition.y, rightControllerPosition.z);
+            }
         }
     }
 
@@ -282,7 +332,9 @@ public class InputHandlerQuest : MonoBehaviour, ICancelQuit
         ribbonGenerator.SetScaledTime(-1f);
         ribbonCloner.transform.rotation = Quaternion.identity;
         ribbonCloner.SetNumber(Random.Range(1, 32));
+        //ribbonCloner.SetSymmetry(symmetry == SymmetryType.Rotation?SymmetryType.Mirror:SymmetryType.Rotation);
         ribbonCloner.ChangeColor(Random.Range(-2, 2));
+        ribbonCloner.ChangeTexture(Random.Range(-2, 2));
         audioSynth.Shuffle();
     }
 

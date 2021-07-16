@@ -9,7 +9,8 @@ public class AudioSynth : MonoBehaviour
 
     public float masterVolume = 1f;
 
-    private float[] freq = { 333.6f, 417f, 422.4f, 528f, 511.2f, 639f, 681.6f, 852f, 710.4f, 888f };
+    private float[] freq = { 99f, 417f, 432f, 528f, 639f, 852f, 888f };
+    private float[] freq4fifths = { 79.2f, 333.6f, 345.6f, 422.4f, 511.2f, 681.6f, 710.4f};
 
     public void Start()
     {
