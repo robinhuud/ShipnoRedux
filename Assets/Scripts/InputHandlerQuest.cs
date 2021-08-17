@@ -13,6 +13,7 @@ public class InputHandlerQuest : MonoBehaviour, ICancelQuit
     public float controllerMovementThreshold = .2f;
     public GameObject quitMenu;
     public GameObject floorObject;
+    public RadialMenuController radialMenu;
 
     public float floorHeight = 1.2f;
 
@@ -24,6 +25,7 @@ public class InputHandlerQuest : MonoBehaviour, ICancelQuit
 
     // should be an enum? whtever
     // 0 = Unknown (Generic)
+    // 1 = Oculus Go
     // 2 = Quest
     // 3 = Rift-S
     private short platform = 0;
@@ -134,8 +136,8 @@ public class InputHandlerQuest : MonoBehaviour, ICancelQuit
     private void ProcessAudio()
     {
         //grab the beats from the ribbon, and pass them to the audioSynth
-        Vector2 baseBeat = ribbonGenerator.GetSinCos();
-        Vector2 halfBeat = ribbonGenerator.GetSinCos(2);
+        Vector2 baseBeat = ribbonGenerator.GetBeat(2);
+        Vector2 halfBeat = ribbonGenerator.GetBeat(4);
         audioSynth.ProcessAudio(baseBeat, halfBeat);
     }
 
@@ -285,6 +287,20 @@ public class InputHandlerQuest : MonoBehaviour, ICancelQuit
             ribbonCloner.transform.rotation = Quaternion.RotateTowards(ribbonCloner.transform.rotation, Quaternion.identity, .05f);
         }
 
+        if(OVRInput.GetDown(OVRInput.Button.SecondaryHandTrigger))
+        {
+            radialMenu.Activate(true);
+        }
+        else if(OVRInput.GetUp(OVRInput.Button.SecondaryHandTrigger))
+        {
+            int action = radialMenu.GetItemId();
+            radialMenu.Deactivate();
+
+            Debug.Log("Selected item " + action);
+
+        }
+
+        /*
         // New change color gesture is right grab trigger then up/down in space for colormap, left/right for texture, fwd/back for speed
         if(OVRInput.GetDown(OVRInput.Button.SecondaryHandTrigger))
         {
@@ -325,6 +341,7 @@ public class InputHandlerQuest : MonoBehaviour, ICancelQuit
                 controllerStartPosition = new Vector3(controllerStartPosition.x, controllerStartPosition.y, rightControllerPosition.z);
             }
         }
+        */
     }
 
     private void RandomizeAction()

@@ -17,7 +17,7 @@ public class RibbonGenerator : MonoBehaviour {
         return new Vector2((verts[0].x / scale.x), (verts[0].y / scale.y));
     }
 
-    public Vector2 GetSinCos(float timeMultiplier = 1f)
+    public Vector2 GetBeat(float timeMultiplier = 1f)
     {
         return new Vector2(Mathf.Sin(timeMultiplier * t * frequency.x), Mathf.Cos(timeMultiplier * t * frequency.y));
     }

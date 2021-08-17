@@ -235,8 +235,8 @@ public class InputHandler : MonoBehaviour, ICancelQuit
     {
         //grab the beats from the ribbon, and pass them to the audioSynth
         Vector2 frequencies = ribbonGenerator.GetScaledEndPoint();
-        Vector2 baseBeat = ribbonGenerator.GetSinCos();
-        Vector2 halfBeat = ribbonGenerator.GetSinCos(2);
+        Vector2 baseBeat = ribbonGenerator.GetBeat();
+        Vector2 halfBeat = ribbonGenerator.GetBeat(2);
         audioSynth.ProcessAudio(baseBeat, halfBeat);
     }
 
